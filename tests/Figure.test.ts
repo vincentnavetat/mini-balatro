@@ -16,6 +16,11 @@ class TestFigure extends Figure {
     return 1;
   }
 
+  requiredCardCount(): number {
+    // For testing purposes, accept any number of cards
+    return this._cards.length;
+  }
+
   score(): number {
     return 10;
   }
@@ -125,6 +130,14 @@ describe("Figure", () => {
       expect(typeof figure.score()).toBe("number");
     });
 
+    it("should require subclasses to implement requiredCardCount()", () => {
+      const cards = [new Card("Heart", "Ace")];
+      const figure = new TestFigure(cards);
+
+      expect(figure.requiredCardCount()).toBe(1);
+      expect(typeof figure.requiredCardCount()).toBe("number");
+    });
+
     it("should allow different implementations in subclasses", () => {
       class CustomFigure extends Figure {
         constructor(cards: Card[]) {
@@ -137,6 +150,10 @@ describe("Figure", () => {
 
         multiplier(): number {
           return 2.5;
+        }
+
+        requiredCardCount(): number {
+          return 1;
         }
 
         score(): number {

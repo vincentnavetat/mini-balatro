@@ -1,25 +1,29 @@
 import { Figure } from "./Figure";
 import { Card } from "./Card";
 
-export class HighCard extends Figure {
+export class Pair extends Figure {
   constructor(cards: Card[]) {
     super(cards);
   }
 
   name(): string {
-    return "High card";
+    return "Pair";
   }
 
   multiplier(): number {
-    return 1;
+    return 2;
   }
 
   requiredCardCount(): number {
-    return 1;
+    return 2;
   }
 
   score(): number {
-    return this._cards[0].points * this.multiplier();
+    let score = 0;
+    this._cards.forEach((card) => {
+      score += card.points;
+    });
+    return score * this.multiplier();
   }
 }
 

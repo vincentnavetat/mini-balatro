@@ -14,14 +14,23 @@ describe("HighCard", () => {
       expect(highCard.cards).toEqual(cards);
     });
 
-    it("should create a HighCard with multiple cards", () => {
+    it("should throw error when created with multiple cards", () => {
       const cards = [
         new Card("Heart", "Ace"),
         new Card("Diamond", "King"),
       ];
-      const highCard = new HighCard(cards);
 
-      expect(highCard.cards.length).toBe(2);
+      expect(() => {
+        new HighCard(cards);
+      }).toThrow("High card requires exactly 1 card(s), but got 2");
+    });
+
+    it("should throw error when created with no cards", () => {
+      const cards: Card[] = [];
+
+      expect(() => {
+        new HighCard(cards);
+      }).toThrow("High card requires exactly 1 card(s), but got 0");
     });
   });
 
@@ -103,23 +112,6 @@ describe("HighCard", () => {
       expect(highCard.score()).toBe(11);
     });
 
-    it("should use the first card for score calculation", () => {
-      const cards = [
-        new Card("Heart", "Ace"),
-        new Card("Diamond", "King"),
-      ];
-      const highCard = new HighCard(cards);
-
-      // Should use cards[0] (Ace = 11), not cards[1] (King = 10)
-      expect(highCard.score()).toBe(11);
-    });
-
-    it("should return 0 for empty cards array", () => {
-      const cards: Card[] = [];
-      const highCard = new HighCard(cards);
-
-      expect(highCard.score()).toBe(0);
-    });
 
     it("should calculate score correctly for all numeric cards", () => {
       const numbers = ["2", "3", "4", "5", "6", "7", "8", "9", "10"];
@@ -165,18 +157,6 @@ describe("HighCard", () => {
   });
 
   describe("edge cases", () => {
-    it("should handle cards with different colours but same number", () => {
-      const cards = [
-        new Card("Heart", "Ace"),
-        new Card("Diamond", "Ace"),
-        new Card("Club", "Ace"),
-      ];
-      const highCard = new HighCard(cards);
-
-      // Should still use first card
-      expect(highCard.score()).toBe(11);
-    });
-
     it("should work with a single card", () => {
       const cards = [new Card("Spade", "7")];
       const highCard = new HighCard(cards);
@@ -184,6 +164,15 @@ describe("HighCard", () => {
       expect(highCard.score()).toBe(7);
       expect(highCard.name()).toBe("High card");
       expect(highCard.multiplier()).toBe(1);
+    });
+  });
+
+  describe("requiredCardCount", () => {
+    it("should return 1", () => {
+      const cards = [new Card("Heart", "Ace")];
+      const highCard = new HighCard(cards);
+
+      expect(highCard.requiredCardCount()).toBe(1);
     });
   });
 });
