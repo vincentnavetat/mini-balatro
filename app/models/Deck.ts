@@ -12,6 +12,16 @@ export class Deck {
     return this._cards;
   }
 
+  drawCards(count: number): Card[] {
+    if (count < 0) {
+      throw new Error(`Cannot draw negative number of cards: ${count}`);
+    }
+    if (count > this._cards.length) {
+      throw new Error(`Cannot draw ${count} cards: only ${this._cards.length} cards remaining in deck`);
+    }
+    return this._cards.splice(0, count);
+  }
+
   private createFullDeck(): Card[] {
     const cards: Card[] = [];
     for (const colour of VALID_COLOURS) {
