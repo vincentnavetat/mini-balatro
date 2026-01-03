@@ -1,5 +1,5 @@
-const VALID_COLOURS = ["Heart", "Diamond", "Club", "Spade"] as const;
-const VALID_NUMBERS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"] as const;
+export const VALID_COLOURS = ["Heart", "Diamond", "Club", "Spade"] as const;
+export const VALID_NUMBERS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"] as const;
 
 export type CardColour = typeof VALID_COLOURS[number];
 export type CardNumber = typeof VALID_NUMBERS[number];
