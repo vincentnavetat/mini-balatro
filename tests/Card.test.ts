@@ -85,6 +85,73 @@ describe("Card", () => {
     });
   });
 
+  describe("points property", () => {
+    it("should return 2 for a 2", () => {
+      const card = new Card("Heart", "2");
+      expect(card.points).toBe(2);
+    });
+
+    it("should return 3 for a 3", () => {
+      const card = new Card("Heart", "3");
+      expect(card.points).toBe(3);
+    });
+
+    it("should return 10 for a 10", () => {
+      const card = new Card("Heart", "10");
+      expect(card.points).toBe(10);
+    });
+
+    it("should return 10 for a Jack", () => {
+      const card = new Card("Heart", "Jack");
+      expect(card.points).toBe(10);
+    });
+
+    it("should return 10 for a Queen", () => {
+      const card = new Card("Heart", "Queen");
+      expect(card.points).toBe(10);
+    });
+
+    it("should return 10 for a King", () => {
+      const card = new Card("Heart", "King");
+      expect(card.points).toBe(10);
+    });
+
+    it("should return 11 for an Ace", () => {
+      const card = new Card("Heart", "Ace");
+      expect(card.points).toBe(11);
+    });
+
+    it("should return correct points for all numeric cards", () => {
+      const numbers = ["2", "3", "4", "5", "6", "7", "8", "9", "10"];
+      numbers.forEach((number, index) => {
+        const card = new Card("Heart", number as CardNumber);
+        expect(card.points).toBe(index + 2); // 2, 3, 4, ..., 10
+      });
+    });
+
+    it("should return correct points for all face cards", () => {
+      const testCases = [
+        { number: "Jack", expected: 10 },
+        { number: "Queen", expected: 10 },
+        { number: "King", expected: 10 },
+        { number: "Ace", expected: 11 },
+      ];
+
+      testCases.forEach(({ number, expected }) => {
+        const card = new Card("Heart", number as CardNumber);
+        expect(card.points).toBe(expected);
+      });
+    });
+
+    it("should return same points regardless of colour", () => {
+      const colours: CardColour[] = ["Heart", "Diamond", "Club", "Spade"];
+      colours.forEach((colour) => {
+        const card = new Card(colour, "Ace");
+        expect(card.points).toBe(11);
+      });
+    });
+  });
+
   describe("edge cases", () => {
     it("should handle numeric strings correctly", () => {
       const card = new Card("Heart", "2");

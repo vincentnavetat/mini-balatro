@@ -23,6 +23,27 @@ export class Card {
     return this._number;
   }
 
+  get points(): number {
+    // Numeric cards
+    if (this._number === "2") return 2;
+    if (this._number === "3") return 3;
+    if (this._number === "4") return 4;
+    if (this._number === "5") return 5;
+    if (this._number === "6") return 6;
+    if (this._number === "7") return 7;
+    if (this._number === "8") return 8;
+    if (this._number === "9") return 9;
+    if (this._number === "10") return 10;
+
+    // Face cards
+    if (this._number === "Jack") return 10;
+    if (this._number === "Queen") return 10;
+    if (this._number === "King") return 10;
+    if (this._number === "Ace") return 11;
+
+    return 0;
+  }
+
   private validateColour(colour: string): void {
     if (!VALID_COLOURS.includes(colour as CardColour)) {
       throw new Error(`Invalid colour: ${colour}. Must be one of: ${VALID_COLOURS.join(", ")}`);
