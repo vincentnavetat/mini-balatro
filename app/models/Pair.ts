@@ -17,13 +17,5 @@ export class Pair extends Figure {
   requiredCardCount(): number {
     return 2;
   }
-
-  score(): number {
-    let score = 0;
-    this._cards.forEach((card) => {
-      score += card.points;
-    });
-    return score * this.multiplier();
-  }
 }
 

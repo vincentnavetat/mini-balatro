@@ -17,9 +17,5 @@ export class HighCard extends Figure {
   requiredCardCount(): number {
     return 1;
   }
-
-  score(): number {
-    return this._cards[0].points * this.multiplier();
-  }
 }
 

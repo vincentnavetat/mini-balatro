@@ -188,7 +188,7 @@ describe("Pair", () => {
 
       expect(typeof pair.name()).toBe("string");
       expect(typeof pair.multiplier()).toBe("number");
-      expect(typeof pair.score()).toBe("number");
+      expect(typeof pair.requiredCardCount()).toBe("number");
     });
   });
 
@@ -210,6 +210,20 @@ describe("Pair", () => {
       const pair = new Pair(cards);
 
       expect(pair.requiredCardCount()).toBe(2);
+    });
+  });
+
+  describe("inherited score method", () => {
+    it("should use inherited score() from Figure that sums card points and multiplies by multiplier", () => {
+      const cards = [
+        new Card("Heart", "5"),
+        new Card("Diamond", "3"),
+      ];
+      const pair = new Pair(cards);
+
+      // Inherited score() = sum of card points * multiplier
+      // = (5 + 3) * 2 = 16
+      expect(pair.score()).toBe(16);
     });
   });
 });

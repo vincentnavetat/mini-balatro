@@ -14,8 +14,15 @@ export abstract class Figure {
 
   abstract name(): string;
   abstract multiplier(): number;
-  abstract score(): number;
   abstract requiredCardCount(): number;
+
+  score(): number {
+    let score = 0;
+    this._cards.forEach((card) => {
+      score += card.points;
+    });
+    return score * this.multiplier();
+  }
 
   protected validateCardCount(): void {
     const required = this.requiredCardCount();

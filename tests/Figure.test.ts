@@ -122,12 +122,43 @@ describe("Figure", () => {
       expect(typeof figure.multiplier()).toBe("number");
     });
 
-    it("should require subclasses to implement score()", () => {
+    it("should provide score() method that can be inherited or overridden", () => {
       const cards = [new Card("Heart", "Ace")];
       const figure = new TestFigure(cards);
 
+      // TestFigure overrides score() to return 10
       expect(figure.score()).toBe(10);
       expect(typeof figure.score()).toBe("number");
+    });
+
+    it("should calculate score by summing card points and multiplying by multiplier", () => {
+      class DefaultScoreFigure extends Figure {
+        constructor(cards: Card[]) {
+          super(cards);
+        }
+
+        name(): string {
+          return "Default Score Figure";
+        }
+
+        multiplier(): number {
+          return 2;
+        }
+
+        requiredCardCount(): number {
+          return 2;
+        }
+        // Does not override score(), uses inherited implementation
+      }
+
+      const cards = [
+        new Card("Heart", "5"),
+        new Card("Diamond", "3"),
+      ];
+      const figure = new DefaultScoreFigure(cards);
+
+      // Should be (5 + 3) * 2 = 16
+      expect(figure.score()).toBe(16);
     });
 
     it("should require subclasses to implement requiredCardCount()", () => {
@@ -136,37 +167,6 @@ describe("Figure", () => {
 
       expect(figure.requiredCardCount()).toBe(1);
       expect(typeof figure.requiredCardCount()).toBe("number");
-    });
-
-    it("should allow different implementations in subclasses", () => {
-      class CustomFigure extends Figure {
-        constructor(cards: Card[]) {
-          super(cards);
-        }
-
-        name(): string {
-          return "Custom Figure";
-        }
-
-        multiplier(): number {
-          return 2.5;
-        }
-
-        requiredCardCount(): number {
-          return 1;
-        }
-
-        score(): number {
-          return 20;
-        }
-      }
-
-      const cards = [new Card("Heart", "Ace")];
-      const figure = new CustomFigure(cards);
-
-      expect(figure.name()).toBe("Custom Figure");
-      expect(figure.multiplier()).toBe(2.5);
-      expect(figure.score()).toBe(20);
     });
   });
 

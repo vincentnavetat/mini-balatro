@@ -152,7 +152,7 @@ describe("HighCard", () => {
 
       expect(typeof highCard.name()).toBe("string");
       expect(typeof highCard.multiplier()).toBe("number");
-      expect(typeof highCard.score()).toBe("number");
+      expect(typeof highCard.requiredCardCount()).toBe("number");
     });
   });
 
@@ -173,6 +173,17 @@ describe("HighCard", () => {
       const highCard = new HighCard(cards);
 
       expect(highCard.requiredCardCount()).toBe(1);
+    });
+  });
+
+  describe("inherited score method", () => {
+    it("should use inherited score() from Figure that sums card points and multiplies by multiplier", () => {
+      const cards = [new Card("Heart", "5")];
+      const highCard = new HighCard(cards);
+
+      // Inherited score() = sum of card points * multiplier
+      // = 5 * 1 = 5
+      expect(highCard.score()).toBe(5);
     });
   });
 });
