@@ -4,6 +4,12 @@ import { Card } from "../app/models/Card";
 import { DoublePair } from "../app/models/DoublePair";
 import { Pair } from "../app/models/Pair";
 import { HighCard } from "../app/models/HighCard";
+import { ThreeOfAKind } from "../app/models/ThreeOfAKind";
+import { FourOfAKind } from "../app/models/FourOfAKind";
+import { Straight } from "../app/models/Straight";
+import { Flush } from "../app/models/Flush";
+import { FullHouse } from "../app/models/FullHouse";
+import { StraightFlush } from "../app/models/StraightFlush";
 
 describe("FigureFactory", () => {
   describe("figureForCards", () => {
@@ -113,9 +119,9 @@ describe("FigureFactory", () => {
           new Card("Heart", "5"),
           new Card("Diamond", "5"),
           new Card("Club", "2"),
-          new Card("Spade", "3"),
-          new Card("Heart", "4"),
-          new Card("Diamond", "6"),
+          new Card("Spade", "7"),
+          new Card("Heart", "9"),
+          new Card("Diamond", "Jack"),
         ];
         const figure = FigureFactory.figureForCards(cards);
 
@@ -125,18 +131,21 @@ describe("FigureFactory", () => {
         expect(figure.cards[1].number).toBe("5");
       });
 
-      it("should return Pair with exactly 2 cards even if more cards of same number exist", () => {
+      it("should return ThreeOfAKind when three cards of same number exist without a pair", () => {
         const cards = [
           new Card("Heart", "Ace"),
           new Card("Diamond", "Ace"),
           new Card("Club", "Ace"),
+          new Card("Spade", "2"),
+          new Card("Heart", "3"),
         ];
         const figure = FigureFactory.figureForCards(cards);
 
-        expect(figure).toBeInstanceOf(Pair);
-        expect(figure.cards.length).toBe(2);
+        expect(figure).toBeInstanceOf(ThreeOfAKind);
+        expect(figure.cards.length).toBe(3);
         expect(figure.cards[0].number).toBe("Ace");
         expect(figure.cards[1].number).toBe("Ace");
+        expect(figure.cards[2].number).toBe("Ace");
       });
     });
 
@@ -212,7 +221,254 @@ describe("FigureFactory", () => {
       });
     });
 
+    describe("ThreeOfAKind", () => {
+      it("should return ThreeOfAKind for three cards of same number without a pair", () => {
+        const cards = [
+          new Card("Heart", "Ace"),
+          new Card("Diamond", "Ace"),
+          new Card("Club", "Ace"),
+          new Card("Spade", "2"),
+          new Card("Heart", "3"),
+        ];
+        const figure = FigureFactory.figureForCards(cards);
+
+        expect(figure).toBeInstanceOf(ThreeOfAKind);
+        expect(figure.cards.length).toBe(3);
+        expect(figure.cards.every((c) => c.number === "Ace")).toBe(true);
+      });
+
+      it("should return ThreeOfAKind with highest three when multiple threes exist but no pairs", () => {
+        const cards = [
+          new Card("Heart", "2"),
+          new Card("Diamond", "2"),
+          new Card("Club", "2"),
+          new Card("Spade", "Ace"),
+          new Card("Heart", "Ace"),
+          new Card("Diamond", "Ace"),
+          new Card("Club", "3"),
+          new Card("Spade", "4"),
+          new Card("Heart", "5"),
+        ];
+        const figure = FigureFactory.figureForCards(cards);
+
+        // With 3 Aces and 3 "2"s, it can form a FullHouse (3 Aces + 2 "2"s)
+        // So it correctly returns FullHouse, not ThreeOfAKind
+        expect(figure).toBeInstanceOf(FullHouse);
+        expect(figure.cards.length).toBe(5);
+      });
+    });
+
+    describe("Straight", () => {
+      it("should return Straight for five consecutive cards", () => {
+        const cards = [
+          new Card("Heart", "2"),
+          new Card("Diamond", "3"),
+          new Card("Club", "4"),
+          new Card("Spade", "5"),
+          new Card("Heart", "6"),
+        ];
+        const figure = FigureFactory.figureForCards(cards);
+
+        expect(figure).toBeInstanceOf(Straight);
+        expect(figure.cards.length).toBe(5);
+      });
+
+      it("should return Straight with highest cards when multiple straights exist", () => {
+        const cards = [
+          new Card("Heart", "2"),
+          new Card("Diamond", "3"),
+          new Card("Club", "4"),
+          new Card("Spade", "5"),
+          new Card("Heart", "6"),
+          new Card("Diamond", "7"),
+          new Card("Club", "8"),
+        ];
+        const figure = FigureFactory.figureForCards(cards);
+
+        expect(figure).toBeInstanceOf(Straight);
+        expect(figure.cards.length).toBe(5);
+      });
+    });
+
+    describe("Flush", () => {
+      it("should return Flush for five cards of same suit", () => {
+        const cards = [
+          new Card("Heart", "2"),
+          new Card("Heart", "5"),
+          new Card("Heart", "7"),
+          new Card("Heart", "9"),
+          new Card("Heart", "King"),
+        ];
+        const figure = FigureFactory.figureForCards(cards);
+
+        expect(figure).toBeInstanceOf(Flush);
+        expect(figure.cards.length).toBe(5);
+        expect(figure.cards.every((c) => c.colour === "Heart")).toBe(true);
+      });
+    });
+
+    describe("FullHouse", () => {
+      it("should return FullHouse for three of one number and two of another", () => {
+        const cards = [
+          new Card("Heart", "Ace"),
+          new Card("Diamond", "Ace"),
+          new Card("Club", "Ace"),
+          new Card("Spade", "King"),
+          new Card("Heart", "King"),
+        ];
+        const figure = FigureFactory.figureForCards(cards);
+
+        expect(figure).toBeInstanceOf(FullHouse);
+        expect(figure.cards.length).toBe(5);
+      });
+    });
+
+    describe("FourOfAKind", () => {
+      it("should return FourOfAKind for four cards of same number", () => {
+        const cards = [
+          new Card("Heart", "Ace"),
+          new Card("Diamond", "Ace"),
+          new Card("Club", "Ace"),
+          new Card("Spade", "Ace"),
+        ];
+        const figure = FigureFactory.figureForCards(cards);
+
+        expect(figure).toBeInstanceOf(FourOfAKind);
+        expect(figure.cards.length).toBe(4);
+        expect(figure.cards.every((c) => c.number === "Ace")).toBe(true);
+      });
+    });
+
+    describe("StraightFlush", () => {
+      it("should return StraightFlush for five consecutive cards of same suit", () => {
+        const cards = [
+          new Card("Heart", "2"),
+          new Card("Heart", "3"),
+          new Card("Heart", "4"),
+          new Card("Heart", "5"),
+          new Card("Heart", "6"),
+        ];
+        const figure = FigureFactory.figureForCards(cards);
+
+        expect(figure).toBeInstanceOf(StraightFlush);
+        expect(figure.cards.length).toBe(5);
+        expect(figure.cards.every((c) => c.colour === "Heart")).toBe(true);
+      });
+    });
+
     describe("priority order", () => {
+      it("should prefer StraightFlush over all other figures", () => {
+        const cards = [
+          new Card("Heart", "2"),
+          new Card("Heart", "3"),
+          new Card("Heart", "4"),
+          new Card("Heart", "5"),
+          new Card("Heart", "6"),
+          new Card("Diamond", "Ace"),
+          new Card("Club", "Ace"),
+          new Card("Spade", "Ace"),
+        ];
+        const figure = FigureFactory.figureForCards(cards);
+
+        expect(figure).toBeInstanceOf(StraightFlush);
+        expect(figure.cards.length).toBe(5);
+      });
+
+      it("should prefer FourOfAKind over FullHouse", () => {
+        const cards = [
+          new Card("Heart", "Ace"),
+          new Card("Diamond", "Ace"),
+          new Card("Club", "Ace"),
+          new Card("Spade", "Ace"),
+          new Card("Heart", "King"),
+          new Card("Diamond", "King"),
+        ];
+        const figure = FigureFactory.figureForCards(cards);
+
+        expect(figure).toBeInstanceOf(FourOfAKind);
+        expect(figure.cards.length).toBe(4);
+      });
+
+      it("should prefer FullHouse over Flush", () => {
+        const cards = [
+          new Card("Heart", "Ace"),
+          new Card("Diamond", "Ace"),
+          new Card("Club", "Ace"),
+          new Card("Heart", "King"),
+          new Card("Spade", "King"),
+          new Card("Heart", "Queen"),
+        ];
+        const figure = FigureFactory.figureForCards(cards);
+
+        // With 3 Aces and 2 Kings, it forms a FullHouse (higher priority than Flush)
+        expect(figure).toBeInstanceOf(FullHouse);
+        expect(figure.cards.length).toBe(5);
+      });
+
+      it("should prefer Flush over Straight", () => {
+        const cards = [
+          new Card("Heart", "2"),
+          new Card("Heart", "5"),
+          new Card("Heart", "7"),
+          new Card("Heart", "9"),
+          new Card("Heart", "King"),
+          new Card("Diamond", "3"),
+          new Card("Club", "4"),
+        ];
+        const figure = FigureFactory.figureForCards(cards);
+
+        expect(figure).toBeInstanceOf(Flush);
+        expect(figure.cards.length).toBe(5);
+      });
+
+      it("should prefer Straight over ThreeOfAKind", () => {
+        const cards = [
+          new Card("Heart", "2"),
+          new Card("Diamond", "3"),
+          new Card("Club", "4"),
+          new Card("Spade", "5"),
+          new Card("Heart", "6"),
+          new Card("Diamond", "Ace"),
+          new Card("Club", "Ace"),
+        ];
+        const figure = FigureFactory.figureForCards(cards);
+
+        expect(figure).toBeInstanceOf(Straight);
+        expect(figure.cards.length).toBe(5);
+      });
+
+      it("should prefer FullHouse over ThreeOfAKind when both are possible", () => {
+        const cards = [
+          new Card("Heart", "Ace"),
+          new Card("Diamond", "Ace"),
+          new Card("Club", "Ace"),
+          new Card("Spade", "King"),
+          new Card("Heart", "King"),
+        ];
+        const figure = FigureFactory.figureForCards(cards);
+
+        expect(figure).toBeInstanceOf(FullHouse);
+        expect(figure.cards.length).toBe(5);
+      });
+
+      it("should prefer FullHouse over DoublePair when both are possible", () => {
+        const cards = [
+          new Card("Heart", "Ace"),
+          new Card("Diamond", "Ace"),
+          new Card("Club", "Ace"),
+          new Card("Spade", "King"),
+          new Card("Heart", "King"),
+          new Card("Diamond", "Queen"),
+          new Card("Club", "Queen"),
+        ];
+        const figure = FigureFactory.figureForCards(cards);
+
+        // With 3 Aces and 2 Kings (or 2 Queens), it forms a FullHouse
+        // FullHouse (multiplier 4) is higher priority than DoublePair (multiplier 2)
+        expect(figure).toBeInstanceOf(FullHouse);
+        expect(figure.cards.length).toBe(5);
+      });
+
       it("should prefer DoublePair over Pair", () => {
         const cards = [
           new Card("Heart", "5"),
@@ -237,25 +493,6 @@ describe("FigureFactory", () => {
         expect(figure).toBeInstanceOf(Pair);
         expect(figure.cards.length).toBe(2);
       });
-
-      it("should prefer DoublePair over Pair even with extra cards", () => {
-        const cards = [
-          new Card("Heart", "5"),
-          new Card("Diamond", "5"),
-          new Card("Club", "3"),
-          new Card("Spade", "3"),
-          new Card("Heart", "Ace"),
-          new Card("Diamond", "Ace"),
-        ];
-        const figure = FigureFactory.figureForCards(cards);
-
-        expect(figure).toBeInstanceOf(DoublePair);
-        expect(figure.cards.length).toBe(4);
-        // Should use the two highest pairs (Aces and 5s)
-        const numbers = figure.cards.map((c) => c.number);
-        expect(numbers.filter((n) => n === "Ace").length).toBe(2);
-        expect(numbers.filter((n) => n === "5").length).toBe(2);
-      });
     });
 
     describe("edge cases", () => {
@@ -268,9 +505,9 @@ describe("FigureFactory", () => {
         ];
         const figure = FigureFactory.figureForCards(cards);
 
-        expect(figure).toBeInstanceOf(DoublePair);
+        expect(figure).toBeInstanceOf(FourOfAKind);
         expect(figure.cards.length).toBe(4);
-        // Should use 2 pairs of Aces
+        // Should use 4 Aces
         const numbers = figure.cards.map((c) => c.number);
         expect(numbers.every((n) => n === "Ace")).toBe(true);
       });
