@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Route } from "./+types/home";
 import { Deck } from "../models/Deck";
 import { Round } from "../models/Round";
@@ -12,9 +12,14 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  const round = useMemo(() => {
+  const [mounted, setMounted] = useState(false);
+  const [round, setRound] = useState<Round | null>(null);
+
+  useEffect(() => {
+    // Only create the deck on the client to avoid hydration mismatch
+    setMounted(true);
     const deck = new Deck();
-    return new Round(deck);
+    setRound(new Round(deck));
   }, []);
 
   const [selectedCards, setSelectedCards] = useState<Set<number>>(new Set());
@@ -23,8 +28,8 @@ export default function Home() {
   const [figureName, setFigureName] = useState<string | null>(null);
   const [handUpdateTrigger, setHandUpdateTrigger] = useState(0); // Trigger re-render when hand changes
 
-  const cards = useMemo(() => [...round.hand.cards], [handUpdateTrigger]);
-  const deckRemaining = useMemo(() => round.deck.cards.length, [handUpdateTrigger]);
+  const cards = useMemo(() => round ? [...round.hand.cards] : [], [round, handUpdateTrigger]);
+  const deckRemaining = useMemo(() => round ? round.deck.cards.length : 0, [round, handUpdateTrigger]);
 
   const handleCardClick = (index: number) => {
     if (submitted) return; // Don't allow selection after submit
@@ -44,6 +49,7 @@ export default function Home() {
   };
 
   const handleDiscard = () => {
+    if (!round) return;
     if (selectedCards.size === 0 || selectedCards.size > 5) return;
     if (selectedCards.size > deckRemaining) {
       // Not enough cards in deck to replace
@@ -52,13 +58,14 @@ export default function Home() {
 
     const indicesToDiscard = Array.from(selectedCards);
     round.hand.discardAndReplace(indicesToDiscard, round.deck);
-    
+
     // Clear selection and trigger re-render
     setSelectedCards(new Set());
     setHandUpdateTrigger(prev => prev + 1);
   };
 
   const handleSubmit = () => {
+    if (!round) return;
     if (selectedCards.size === 0) return;
 
     const selectedCardArray = Array.from(selectedCards)
@@ -101,6 +108,18 @@ export default function Home() {
         return "";
     }
   };
+
+  if (!mounted || !round) {
+    return (
+      <main className="min-h-screen p-8 bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">
+            Mini Balatro
+          </h1>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen p-8 bg-gray-50 dark:bg-gray-900">

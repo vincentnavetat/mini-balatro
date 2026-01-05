@@ -5,6 +5,7 @@ export class Deck {
 
   constructor() {
     this._cards = this.createFullDeck();
+
     this.shuffle();
   }
 
