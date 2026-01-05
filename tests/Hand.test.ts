@@ -184,6 +184,49 @@ describe("Hand", () => {
       expect(deck.cards.length).toBe(initialDeckSize - 3);
     });
 
+    it("should maintain positions of non-discarded cards", () => {
+      const deck = new Deck();
+      const hand = new Hand(deck);
+      const cardAtPosition1 = hand.cards[1];
+      const cardAtPosition3 = hand.cards[3];
+      const cardAtPosition5 = hand.cards[5];
+      const cardAtPosition6 = hand.cards[6];
+      
+      // Discard card at position 4
+      hand.discardAndReplace([4], deck);
+      
+      // Cards at other positions should remain in their positions
+      expect(hand.cards[1]).toBe(cardAtPosition1);
+      expect(hand.cards[3]).toBe(cardAtPosition3);
+      expect(hand.cards[5]).toBe(cardAtPosition5);
+      expect(hand.cards[6]).toBe(cardAtPosition6);
+      
+      // Card at position 4 should be new (different)
+      expect(hand.cards[4]).not.toBe(cardAtPosition1);
+      expect(hand.cards[4]).not.toBe(cardAtPosition3);
+      expect(hand.cards[4]).not.toBe(cardAtPosition5);
+      expect(hand.cards[4]).not.toBe(cardAtPosition6);
+    });
+
+    it("should maintain positions when discarding multiple cards", () => {
+      const deck = new Deck();
+      const hand = new Hand(deck);
+      const cardAtPosition0 = hand.cards[0];
+      const cardAtPosition2 = hand.cards[2];
+      const cardAtPosition6 = hand.cards[6];
+      
+      // Discard cards at positions 1, 3, 4, 5
+      hand.discardAndReplace([1, 3, 4, 5], deck);
+      
+      // Cards at non-discarded positions should remain
+      expect(hand.cards[0]).toBe(cardAtPosition0);
+      expect(hand.cards[2]).toBe(cardAtPosition2);
+      expect(hand.cards[6]).toBe(cardAtPosition6);
+      
+      // Hand should still have 7 cards
+      expect(hand.cards.length).toBe(7);
+    });
+
     it("should ensure no duplicate cards after discard and replace", () => {
       const deck = new Deck();
       const hand = new Hand(deck);
@@ -235,7 +278,7 @@ describe("Hand", () => {
       expect(hand.cards.length).toBe(7);
     });
 
-    it("should replace cards with new cards from deck", () => {
+    it("should replace cards with new cards from deck at the same position", () => {
       const deck = new Deck();
       const hand = new Hand(deck);
       const topDeckCard = deck.cards[0];
@@ -243,13 +286,13 @@ describe("Hand", () => {
       
       hand.discardAndReplace([0], deck);
       
-      // The last card in hand should be the top card from deck
-      expect(hand.cards[hand.cards.length - 1]).toBe(topDeckCard);
+      // The card at index 0 should be the top card from deck (replaced at same position)
+      expect(hand.cards[0]).toBe(topDeckCard);
       
       hand.discardAndReplace([0], deck);
       
-      // The last card should now be the second card from original deck
-      expect(hand.cards[hand.cards.length - 1]).toBe(secondDeckCard);
+      // The card at index 0 should now be the second card from original deck
+      expect(hand.cards[0]).toBe(secondDeckCard);
     });
 
     it("should handle discarding the same index multiple times correctly", () => {

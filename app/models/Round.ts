@@ -88,9 +88,9 @@ export class Round {
     this._currentScore += figure.score();
 
     // Discard only the cards from the figure, keep remaining cards in hand
-    // Then draw new cards to bring hand back to 7 cards
-    this._hand.removeCards([...figure.cards]);
-    this._hand.drawToFill(this._deck, 7);
+    // Then draw new cards at the same positions where cards were removed
+    const removedIndices = this._hand.removeCards([...figure.cards]);
+    this._hand.drawToFill(this._deck, 7, removedIndices);
     this._figure = null;
 
     // Increment figures played count
