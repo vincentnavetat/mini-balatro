@@ -32,6 +32,15 @@ describe("Home", () => {
       expect(screen.queryByText(/Figure:/)).not.toBeInTheDocument();
       expect(screen.queryByText(/Score:/)).not.toBeInTheDocument();
     });
+
+    it("should display score indicator with current score and target score", async () => {
+      renderComponent();
+      await waitFor(() => {
+        expect(screen.getByText(/Current Score/)).toBeInTheDocument();
+        expect(screen.getByText(/Target Score/)).toBeInTheDocument();
+        expect(screen.getByText(/Figures Played/)).toBeInTheDocument();
+      }, { timeout: 3000 });
+    });
   });
 
   describe("card selection", () => {

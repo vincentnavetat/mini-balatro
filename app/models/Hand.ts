@@ -32,5 +32,26 @@ export class Hand {
     const newCards = deck.drawCards(indices.length);
     this._cards.push(...newCards);
   }
+
+  removeCards(cardsToRemove: Card[]): void {
+    // Remove cards by matching colour and number
+    for (const cardToRemove of cardsToRemove) {
+      const index = this._cards.findIndex(
+        (card) => card.colour === cardToRemove.colour && card.number === cardToRemove.number
+      );
+      if (index !== -1) {
+        this._cards.splice(index, 1);
+      }
+    }
+  }
+
+  drawToFill(deck: Deck, targetCount: number): void {
+    // Draw cards until hand has targetCount cards
+    const cardsNeeded = targetCount - this._cards.length;
+    if (cardsNeeded > 0) {
+      const newCards = deck.drawCards(cardsNeeded);
+      this._cards.push(...newCards);
+    }
+  }
 }
 

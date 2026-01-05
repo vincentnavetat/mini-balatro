@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Route } from "./+types/home";
 import { Deck } from "../models/Deck";
-import { Round, MAX_DISCARDS } from "../models/Round";
+import { Round, MAX_DISCARDS, MAX_FIGURES } from "../models/Round";
 import { FigureFactory } from "../models/FigureFactory";
 
 export function meta({}: Route.MetaArgs) {
@@ -19,7 +19,7 @@ export default function Home() {
     // Only create the deck on the client to avoid hydration mismatch
     setMounted(true);
     const deck = new Deck();
-    setRound(new Round(deck));
+    setRound(new Round(deck, 300));
   }, []);
 
   const [selectedCards, setSelectedCards] = useState<Set<number>>(new Set());
@@ -32,6 +32,12 @@ export default function Home() {
   const deckRemaining = useMemo(() => round ? round.deck.cards.length : 0, [round, handUpdateTrigger]);
   const canDiscard = useMemo(() => round ? round.canDiscard() : false, [round, handUpdateTrigger]);
   const discardCount = useMemo(() => round ? round.discardCount : 0, [round, handUpdateTrigger]);
+  const currentScore = useMemo(() => round ? round.currentScore : 0, [round, handUpdateTrigger]);
+  const targetScore = useMemo(() => round ? round.targetScore : 300, [round, handUpdateTrigger]);
+  const figuresPlayed = useMemo(() => round ? round.figuresPlayed : 0, [round, handUpdateTrigger]);
+  const canPlayFigure = useMemo(() => round ? round.canPlayFigure() : false, [round, handUpdateTrigger]);
+  const isWon = useMemo(() => round ? round.isWon() : false, [round, handUpdateTrigger]);
+  const isLost = useMemo(() => round ? round.isLost() : false, [round, handUpdateTrigger]);
 
   const handleCardClick = (index: number) => {
     if (submitted) return; // Don't allow selection after submit
@@ -65,7 +71,7 @@ export default function Home() {
     const indicesToDiscard = Array.from(selectedCards);
     round.hand.discardAndReplace(indicesToDiscard, round.deck);
     round.incrementDiscardCount();
-    
+
     // Clear selection and trigger re-render
     setSelectedCards(new Set());
     setHandUpdateTrigger(prev => prev + 1);
@@ -74,6 +80,7 @@ export default function Home() {
   const handleSubmit = () => {
     if (!round) return;
     if (selectedCards.size === 0) return;
+    if (!round.canPlayFigure()) return;
 
     const selectedCardArray = Array.from(selectedCards)
       .map((index) => cards[index])
@@ -81,10 +88,27 @@ export default function Home() {
 
     if (selectedCardArray.length > 0) {
       const figure = FigureFactory.figureForCards(selectedCardArray);
-      round.figure = figure;
+      round.playFigure(figure);
+
+      // Show the figure that was played
       setScore(figure.score());
       setFigureName(figure.name());
       setSubmitted(true);
+
+      // Update hand trigger to reflect new cards
+      setHandUpdateTrigger(prev => prev + 1);
+
+      // If user can play another figure, reset after a brief moment
+      // Otherwise, keep submitted state to show final result
+      if (round.canPlayFigure()) {
+        // Reset after showing the result briefly
+        setTimeout(() => {
+          setSubmitted(false);
+          setSelectedCards(new Set());
+          setScore(null);
+          setFigureName(null);
+        }, 1500);
+      }
     }
   };
 
@@ -134,6 +158,46 @@ export default function Home() {
         <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">
           Mini Balatro
         </h1>
+
+        {/* Score Indicator */}
+        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border-2 border-blue-200 dark:border-blue-800">
+          <div className="flex justify-between items-center">
+            <div>
+              <div className="text-sm text-blue-700 dark:text-blue-300 font-medium">
+                Current Score
+              </div>
+              <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">
+                {currentScore}
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm text-blue-700 dark:text-blue-300 font-medium">
+                Target Score
+              </div>
+              <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">
+                {targetScore}
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-blue-700 dark:text-blue-300 font-medium">
+                Figures Played
+              </div>
+              <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">
+                {figuresPlayed} / {MAX_FIGURES}
+              </div>
+            </div>
+          </div>
+          {isWon && (
+            <div className="mt-3 text-center text-lg font-bold text-green-700 dark:text-green-300">
+              🎉 You Won! 🎉
+            </div>
+          )}
+          {isLost && (
+            <div className="mt-3 text-center text-lg font-bold text-red-700 dark:text-red-300">
+              Game Over - You Lost
+            </div>
+          )}
+        </div>
 
         <div className="mb-4">
           <div className="flex justify-between items-center mb-4">
@@ -210,9 +274,9 @@ export default function Home() {
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={selectedCards.size === 0}
+                disabled={selectedCards.size === 0 || !canPlayFigure}
                 className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-                  selectedCards.size === 0
+                  selectedCards.size === 0 || !canPlayFigure
                     ? "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
                     : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transform hover:scale-105"
                 }`}
@@ -228,7 +292,7 @@ export default function Home() {
                 Figure: {figureName}
               </div>
               <div className="text-2xl font-bold text-green-700 dark:text-green-300 mt-2">
-                Score: {score}
+                Score: +{score} (Total: {currentScore})
               </div>
             </div>
           )}
