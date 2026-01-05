@@ -11,5 +11,26 @@ export class Hand {
   get cards(): readonly Card[] {
     return this._cards;
   }
+
+  discardAndReplace(indices: number[], deck: Deck): void {
+    // Sort indices in descending order to remove from end to beginning
+    const sortedIndices = [...indices].sort((a, b) => b - a);
+
+    // Validate indices
+    for (const index of sortedIndices) {
+      if (index < 0 || index >= this._cards.length) {
+        throw new Error(`Invalid card index: ${index}`);
+      }
+    }
+
+    // Remove cards at specified indices
+    for (const index of sortedIndices) {
+      this._cards.splice(index, 1);
+    }
+
+    // Draw new cards to replace discarded ones
+    const newCards = deck.drawCards(indices.length);
+    this._cards.push(...newCards);
+  }
 }
 

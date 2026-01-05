@@ -21,8 +21,10 @@ export default function Home() {
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [figureName, setFigureName] = useState<string | null>(null);
+  const [handUpdateTrigger, setHandUpdateTrigger] = useState(0); // Trigger re-render when hand changes
 
-  const cards = round.hand.cards;
+  const cards = useMemo(() => [...round.hand.cards], [handUpdateTrigger]);
+  const deckRemaining = useMemo(() => round.deck.cards.length, [handUpdateTrigger]);
 
   const handleCardClick = (index: number) => {
     if (submitted) return; // Don't allow selection after submit
@@ -39,6 +41,21 @@ export default function Home() {
       }
       return newSet;
     });
+  };
+
+  const handleDiscard = () => {
+    if (selectedCards.size === 0 || selectedCards.size > 5) return;
+    if (selectedCards.size > deckRemaining) {
+      // Not enough cards in deck to replace
+      return;
+    }
+
+    const indicesToDiscard = Array.from(selectedCards);
+    round.hand.discardAndReplace(indicesToDiscard, round.deck);
+    
+    // Clear selection and trigger re-render
+    setSelectedCards(new Set());
+    setHandUpdateTrigger(prev => prev + 1);
   };
 
   const handleSubmit = () => {
@@ -93,9 +110,14 @@ export default function Home() {
         </h1>
 
         <div className="mb-4">
-          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
-            Your Hand ({cards.length} cards)
-          </h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+              Your Hand ({cards.length} cards)
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Deck: {deckRemaining} cards remaining
+            </p>
+          </div>
           {!submitted && (
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Select up to 5 cards ({selectedCards.size} / 5 selected)
@@ -142,17 +164,32 @@ export default function Home() {
         </div>
 
         <div className="mt-8 flex flex-col items-center gap-4">
-          <button
-            onClick={handleSubmit}
-            disabled={selectedCards.size === 0 || submitted}
-            className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-              selectedCards.size === 0 || submitted
-                ? "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transform hover:scale-105"
-            }`}
-          >
-            Submit
-          </button>
+          {!submitted && (
+            <div className="flex gap-4">
+              <button
+                onClick={handleDiscard}
+                disabled={selectedCards.size === 0 || selectedCards.size > 5 || selectedCards.size > deckRemaining}
+                className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+                  selectedCards.size === 0 || selectedCards.size > 5 || selectedCards.size > deckRemaining
+                    ? "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                    : "bg-orange-600 hover:bg-orange-700 text-white shadow-md hover:shadow-lg transform hover:scale-105"
+                }`}
+              >
+                Discard {selectedCards.size > 0 ? `(${selectedCards.size})` : ""}
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={selectedCards.size === 0}
+                className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+                  selectedCards.size === 0
+                    ? "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transform hover:scale-105"
+                }`}
+              >
+                Submit
+              </button>
+            </div>
+          )}
 
           {submitted && figureName !== null && score !== null && (
             <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/30 rounded-lg border-2 border-green-200 dark:border-green-800">
