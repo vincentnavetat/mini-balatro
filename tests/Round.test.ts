@@ -160,5 +160,48 @@ describe("Round", () => {
       expect(uniqueKeys.size).toBe(14);
     });
   });
+
+  describe("discard count", () => {
+    it("should start with discard count of 0", () => {
+      const deck = new Deck();
+      const round = new Round(deck);
+
+      expect(round.discardCount).toBe(0);
+    });
+
+    it("should allow discarding when count is less than 2", () => {
+      const deck = new Deck();
+      const round = new Round(deck);
+
+      expect(round.canDiscard()).toBe(true);
+      round.incrementDiscardCount();
+      expect(round.canDiscard()).toBe(true);
+    });
+
+    it("should not allow discarding after 2 discards", () => {
+      const deck = new Deck();
+      const round = new Round(deck);
+
+      round.incrementDiscardCount();
+      expect(round.discardCount).toBe(1);
+      expect(round.canDiscard()).toBe(true);
+
+      round.incrementDiscardCount();
+      expect(round.discardCount).toBe(2);
+      expect(round.canDiscard()).toBe(false);
+    });
+
+    it("should throw error when trying to increment beyond 2", () => {
+      const deck = new Deck();
+      const round = new Round(deck);
+
+      round.incrementDiscardCount();
+      round.incrementDiscardCount();
+
+      expect(() => {
+        round.incrementDiscardCount();
+      }).toThrow("Cannot discard more than 2 times per round");
+    });
+  });
 });
 

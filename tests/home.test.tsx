@@ -200,5 +200,122 @@ describe("Home", () => {
       }
     });
   });
+
+  describe("discard functionality", () => {
+    const getClickableCard = (cardNumberElement: HTMLElement): HTMLElement | null => {
+      let element: HTMLElement | null = cardNumberElement;
+      while (element) {
+        const className = element.getAttribute?.('class') || '';
+        if (className.includes('cursor-pointer')) {
+          return element;
+        }
+        element = element.parentElement;
+      }
+      return null;
+    };
+
+    it("should display discard count initially", async () => {
+      renderComponent();
+      await waitFor(() => {
+        expect(screen.getByText(/Discards remaining: 2 \/ 2/)).toBeInTheDocument();
+      }, { timeout: 3000 });
+    });
+
+    it("should allow discarding when count is less than 2", async () => {
+      const user = userEvent.setup();
+      renderComponent();
+
+      const discardButton = screen.getByRole("button", { name: /discard/i });
+      const cardNumbers = screen.getAllByText(/Ace|King|Queen|Jack|2|3|4|5|6|7|8|9|10/);
+
+      if (cardNumbers.length > 0) {
+        const clickableCard = getClickableCard(cardNumbers[0] as HTMLElement);
+
+        if (clickableCard) {
+          await user.click(clickableCard);
+          await waitFor(() => {
+            expect(discardButton).toBeEnabled();
+          }, { timeout: 3000 });
+
+          await user.click(discardButton);
+          await waitFor(() => {
+            expect(screen.getByText(/Discards remaining: 1 \/ 2/)).toBeInTheDocument();
+          }, { timeout: 3000 });
+        }
+      }
+    });
+
+    it("should disable discard button after 2 discards", async () => {
+      const user = userEvent.setup();
+      renderComponent();
+
+      const discardButton = screen.getByRole("button", { name: /discard/i });
+      const cardNumbers = screen.getAllByText(/Ace|King|Queen|Jack|2|3|4|5|6|7|8|9|10/);
+
+      if (cardNumbers.length >= 2) {
+        // First discard
+        const firstCard = getClickableCard(cardNumbers[0] as HTMLElement);
+        if (firstCard) {
+          await user.click(firstCard);
+          await waitFor(() => {
+            expect(discardButton).toBeEnabled();
+          }, { timeout: 3000 });
+          await user.click(discardButton);
+          await waitFor(() => {
+            expect(screen.getByText(/Discards remaining: 1 \/ 2/)).toBeInTheDocument();
+          }, { timeout: 3000 });
+        }
+
+        // Second discard
+        const secondCard = getClickableCard(cardNumbers[1] as HTMLElement);
+        if (secondCard) {
+          await user.click(secondCard);
+          await waitFor(() => {
+            expect(discardButton).toBeEnabled();
+          }, { timeout: 3000 });
+          await user.click(discardButton);
+          await waitFor(() => {
+            expect(screen.getByText(/Discards remaining: 0 \/ 2/)).toBeInTheDocument();
+            expect(discardButton).toBeDisabled();
+          }, { timeout: 3000 });
+        }
+      }
+    });
+
+    it("should keep discard button disabled after reaching limit even with cards selected", async () => {
+      const user = userEvent.setup();
+      renderComponent();
+
+      const discardButton = screen.getByRole("button", { name: /discard/i });
+      const cardNumbers = screen.getAllByText(/Ace|King|Queen|Jack|2|3|4|5|6|7|8|9|10/);
+
+      if (cardNumbers.length >= 3) {
+        // Perform 2 discards
+        for (let i = 0; i < 2; i++) {
+          const card = getClickableCard(cardNumbers[i] as HTMLElement);
+          if (card) {
+            await user.click(card);
+            await waitFor(() => {
+              expect(discardButton).toBeEnabled();
+            }, { timeout: 3000 });
+            await user.click(discardButton);
+            await waitFor(() => {
+              expect(discardButton).toBeDisabled();
+            }, { timeout: 3000 });
+          }
+        }
+
+        // Try to select a card after reaching limit
+        const thirdCard = getClickableCard(cardNumbers[2] as HTMLElement);
+        if (thirdCard) {
+          await user.click(thirdCard);
+          await waitFor(() => {
+            // Button should still be disabled even with a card selected
+            expect(discardButton).toBeDisabled();
+          }, { timeout: 3000 });
+        }
+      }
+    });
+  });
 });
 

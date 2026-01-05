@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Route } from "./+types/home";
 import { Deck } from "../models/Deck";
-import { Round } from "../models/Round";
+import { Round, MAX_DISCARDS } from "../models/Round";
 import { FigureFactory } from "../models/FigureFactory";
 
 export function meta({}: Route.MetaArgs) {
@@ -30,6 +30,8 @@ export default function Home() {
 
   const cards = useMemo(() => round ? [...round.hand.cards] : [], [round, handUpdateTrigger]);
   const deckRemaining = useMemo(() => round ? round.deck.cards.length : 0, [round, handUpdateTrigger]);
+  const canDiscard = useMemo(() => round ? round.canDiscard() : false, [round, handUpdateTrigger]);
+  const discardCount = useMemo(() => round ? round.discardCount : 0, [round, handUpdateTrigger]);
 
   const handleCardClick = (index: number) => {
     if (submitted) return; // Don't allow selection after submit
@@ -55,10 +57,15 @@ export default function Home() {
       // Not enough cards in deck to replace
       return;
     }
+    if (!round.canDiscard()) {
+      // Already discarded twice
+      return;
+    }
 
     const indicesToDiscard = Array.from(selectedCards);
     round.hand.discardAndReplace(indicesToDiscard, round.deck);
-
+    round.incrementDiscardCount();
+    
     // Clear selection and trigger re-render
     setSelectedCards(new Set());
     setHandUpdateTrigger(prev => prev + 1);
@@ -138,9 +145,14 @@ export default function Home() {
             </p>
           </div>
           {!submitted && (
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Select up to 5 cards ({selectedCards.size} / 5 selected)
-            </p>
+            <div className="space-y-1">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Select up to 5 cards ({selectedCards.size} / 5 selected)
+              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Discards remaining: {MAX_DISCARDS - discardCount} / {MAX_DISCARDS}
+              </p>
+            </div>
           )}
         </div>
 
@@ -187,9 +199,9 @@ export default function Home() {
             <div className="flex gap-4">
               <button
                 onClick={handleDiscard}
-                disabled={selectedCards.size === 0 || selectedCards.size > 5 || selectedCards.size > deckRemaining}
+                disabled={selectedCards.size === 0 || selectedCards.size > 5 || selectedCards.size > deckRemaining || !canDiscard}
                 className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-                  selectedCards.size === 0 || selectedCards.size > 5 || selectedCards.size > deckRemaining
+                  selectedCards.size === 0 || selectedCards.size > 5 || selectedCards.size > deckRemaining || !canDiscard
                     ? "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
                     : "bg-orange-600 hover:bg-orange-700 text-white shadow-md hover:shadow-lg transform hover:scale-105"
                 }`}
