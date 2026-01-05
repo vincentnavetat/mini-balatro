@@ -32,7 +32,10 @@ export default function Home() {
       if (newSet.has(index)) {
         newSet.delete(index);
       } else {
-        newSet.add(index);
+        // Only allow adding if we haven't reached the limit of 5 cards
+        if (newSet.size < 5) {
+          newSet.add(index);
+        }
       }
       return newSet;
     });
@@ -93,20 +96,34 @@ export default function Home() {
           <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
             Your Hand ({cards.length} cards)
           </h2>
+          {!submitted && (
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Select up to 5 cards ({selectedCards.size} / 5 selected)
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4">
           {cards.map((card, index) => {
             const isSelected = selectedCards.has(index);
+            const isDisabled = !submitted && !isSelected && selectedCards.size >= 5;
             return (
               <div
                 key={index}
                 onClick={() => handleCardClick(index)}
-                className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border-2 transition-all cursor-pointer ${
+                className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border-2 transition-all ${
+                  submitted
+                    ? "cursor-default"
+                    : isDisabled
+                    ? "cursor-not-allowed opacity-50"
+                    : "cursor-pointer"
+                } ${
                   isSelected
                     ? "border-blue-500 dark:border-blue-400 ring-4 ring-blue-200 dark:ring-blue-800 shadow-lg scale-105"
+                    : isDisabled
+                    ? "border-gray-200 dark:border-gray-700"
                     : "border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600"
-                } ${submitted ? "cursor-default" : ""}`}
+                }`}
               >
                 <div className={`text-4xl font-bold text-center ${getColourClass(card.colour)}`}>
                   {getColourSymbol(card.colour)}
