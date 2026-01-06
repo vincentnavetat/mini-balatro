@@ -3,6 +3,7 @@ import type { Route } from "./+types/home";
 import { Deck } from "../models/Deck";
 import { Round, MAX_DISCARDS, MAX_FIGURES } from "../models/Round";
 import { FigureFactory } from "../models/FigureFactory";
+import { Player } from "../models/Player";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -14,12 +15,14 @@ export function meta({}: Route.MetaArgs) {
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [round, setRound] = useState<Round | null>(null);
+  const [player, setPlayer] = useState<Player | null>(null);
 
   useEffect(() => {
     // Only create the deck on the client to avoid hydration mismatch
     setMounted(true);
     const deck = new Deck();
     setRound(new Round(deck, 300));
+    setPlayer(new Player());
   }, []);
 
   const [selectedCards, setSelectedCards] = useState<Set<number>>(new Set());
@@ -170,9 +173,17 @@ export default function Home() {
   return (
     <main className="min-h-screen p-8 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">
-          Mini Balatro
-        </h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            Mini Balatro
+          </h1>
+          <div className="px-4 py-2 bg-yellow-100 dark:bg-yellow-900/40 rounded-full border-2 border-yellow-200 dark:border-yellow-800 flex items-center gap-2">
+            <span className="text-yellow-700 dark:text-yellow-400 font-bold text-xl">$</span>
+            <span className="text-yellow-900 dark:text-yellow-100 font-bold text-xl">
+              {player?.money ?? 0}
+            </span>
+          </div>
+        </div>
 
         {/* Score Indicator */}
         <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border-2 border-blue-200 dark:border-blue-800">
