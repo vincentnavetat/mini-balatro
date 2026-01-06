@@ -39,6 +39,21 @@ export default function Home() {
   const isWon = useMemo(() => round ? round.isWon() : false, [round, handUpdateTrigger]);
   const isLost = useMemo(() => round ? round.isLost() : false, [round, handUpdateTrigger]);
 
+  const currentFigureName = useMemo(() => {
+    if (selectedCards.size === 0 || submitted) return null;
+    const selectedCardArray = Array.from(selectedCards)
+      .map((index) => cards[index])
+      .filter((card) => card !== undefined);
+
+    if (selectedCardArray.length === 0) return null;
+
+    try {
+      return FigureFactory.figureForCards(selectedCardArray).name();
+    } catch (e) {
+      return null;
+    }
+  }, [selectedCards, cards, submitted]);
+
   const handleCardClick = (index: number) => {
     if (submitted) return; // Don't allow selection after submit
 
@@ -259,6 +274,11 @@ export default function Home() {
         </div>
 
         <div className="mt-8 flex flex-col items-center gap-4">
+          {!submitted && currentFigureName && (
+            <div className="mb-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/40 rounded-full text-blue-800 dark:text-blue-200 font-bold text-lg shadow-sm border border-blue-200 dark:border-blue-700">
+              {currentFigureName}
+            </div>
+          )}
           {!submitted && (
             <div className="flex gap-4">
               <button
