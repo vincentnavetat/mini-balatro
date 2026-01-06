@@ -1,13 +1,13 @@
-import { Figure } from "./Figure";
-import { Card } from "./Card";
+import { Figure } from "../Figure";
+import { Card } from "../Card";
 
-export class DoublePair extends Figure {
+export class Pair extends Figure {
   constructor(cards: Card[]) {
     super(cards);
   }
 
   name(): string {
-    return "Double Pair";
+    return "Pair";
   }
 
   multiplier(): number {
@@ -15,11 +15,11 @@ export class DoublePair extends Figure {
   }
 
   chips(): number {
-    return 20;
+    return 10;
   }
 
   requiredCardCount(): number {
-    return 4;
+    return 2;
   }
 }
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Pair } from "../app/models/Pair";
+import { Pair } from "../app/models/figures/Pair";
 import { Card } from "../app/models/Card";
 import { Figure } from "../app/models/Figure";
 

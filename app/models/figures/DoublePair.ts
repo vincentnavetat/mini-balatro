@@ -1,25 +1,24 @@
-import { Figure } from "./Figure";
-import { Card } from "./Card";
+import { Figure } from "../Figure";
+import { Card } from "../Card";
 
-export class FourOfAKind extends Figure {
+export class DoublePair extends Figure {
   constructor(cards: Card[]) {
     super(cards);
   }
 
   name(): string {
-    return "Four of a kind";
+    return "Double Pair";
   }
 
   multiplier(): number {
-    return 7;
+    return 2;
   }
 
   chips(): number {
-    return 60;
+    return 20;
   }
 
   requiredCardCount(): number {
     return 4;
   }
 }
-

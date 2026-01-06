@@ -1,5 +1,5 @@
-import { Figure } from "./Figure";
-import { Card } from "./Card";
+import { Figure } from "../Figure";
+import { Card } from "../Card";
 
 export class ThreeOfAKind extends Figure {
   constructor(cards: Card[]) {

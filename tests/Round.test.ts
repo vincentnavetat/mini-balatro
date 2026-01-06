@@ -3,8 +3,8 @@ import { Round, MAX_FIGURES } from "../app/models/Round";
 import { Deck } from "../app/models/Deck";
 import { Hand } from "../app/models/Hand";
 import { Card } from "../app/models/Card";
-import { HighCard } from "../app/models/HighCard";
-import { Pair } from "../app/models/Pair";
+import { HighCard } from "../app/models/figures/HighCard";
+import { Pair } from "../app/models/figures/Pair";
 
 describe("Round", () => {
   describe("constructor", () => {

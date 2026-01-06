@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { FullHouse } from "../app/models/FullHouse";
+import { FullHouse } from "../app/models/figures/FullHouse";
 import { Card } from "../app/models/Card";
 import { Figure } from "../app/models/Figure";
 

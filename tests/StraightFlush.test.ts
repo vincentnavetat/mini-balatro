@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { StraightFlush } from "../app/models/StraightFlush";
+import { StraightFlush } from "../app/models/figures/StraightFlush";
 import { Card } from "../app/models/Card";
 import { Figure } from "../app/models/Figure";
 

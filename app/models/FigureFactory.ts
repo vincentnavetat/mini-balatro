@@ -1,14 +1,14 @@
 import { Card, VALID_NUMBERS } from "./Card";
 import { Figure } from "./Figure";
-import { DoublePair } from "./DoublePair";
-import { Pair } from "./Pair";
-import { HighCard } from "./HighCard";
-import { ThreeOfAKind } from "./ThreeOfAKind";
-import { FourOfAKind } from "./FourOfAKind";
-import { Straight } from "./Straight";
-import { Flush } from "./Flush";
-import { FullHouse } from "./FullHouse";
-import { StraightFlush } from "./StraightFlush";
+import { DoublePair } from "./figures/DoublePair";
+import { Pair } from "./figures/Pair";
+import { HighCard } from "./figures/HighCard";
+import { ThreeOfAKind } from "./figures/ThreeOfAKind";
+import { FourOfAKind } from "./figures/FourOfAKind";
+import { Straight } from "./figures/Straight";
+import { Flush } from "./figures/Flush";
+import { FullHouse } from "./figures/FullHouse";
+import { StraightFlush } from "./figures/StraightFlush";
 
 export class FigureFactory {
   static figureForCards(cards: Card[]): Figure {

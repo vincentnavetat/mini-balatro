@@ -1,15 +1,15 @@
 import { describe, it, expect } from "vitest";
 import { FigureFactory } from "../app/models/FigureFactory";
 import { Card } from "../app/models/Card";
-import { DoublePair } from "../app/models/DoublePair";
-import { Pair } from "../app/models/Pair";
-import { HighCard } from "../app/models/HighCard";
-import { ThreeOfAKind } from "../app/models/ThreeOfAKind";
-import { FourOfAKind } from "../app/models/FourOfAKind";
-import { Straight } from "../app/models/Straight";
-import { Flush } from "../app/models/Flush";
-import { FullHouse } from "../app/models/FullHouse";
-import { StraightFlush } from "../app/models/StraightFlush";
+import { DoublePair } from "../app/models/figures/DoublePair";
+import { Pair } from "../app/models/figures/Pair";
+import { HighCard } from "../app/models/figures/HighCard";
+import { ThreeOfAKind } from "../app/models/figures/ThreeOfAKind";
+import { FourOfAKind } from "../app/models/figures/FourOfAKind";
+import { Straight } from "../app/models/figures/Straight";
+import { Flush } from "../app/models/figures/Flush";
+import { FullHouse } from "../app/models/figures/FullHouse";
+import { StraightFlush } from "../app/models/figures/StraightFlush";
 
 describe("FigureFactory", () => {
   describe("figureForCards", () => {

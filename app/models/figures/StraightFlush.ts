@@ -1,21 +1,21 @@
-import { Figure } from "./Figure";
-import { Card } from "./Card";
+import { Figure } from "../Figure";
+import { Card } from "../Card";
 
-export class Flush extends Figure {
+export class StraightFlush extends Figure {
   constructor(cards: Card[]) {
     super(cards);
   }
 
   name(): string {
-    return "Flush";
+    return "Straight flush";
   }
 
   multiplier(): number {
-    return 4;
+    return 8;
   }
 
   chips(): number {
-    return 35;
+    return 100;
   }
 
   requiredCardCount(): number {
