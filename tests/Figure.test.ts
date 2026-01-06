@@ -16,6 +16,10 @@ class TestFigure extends Figure {
     return 1;
   }
 
+  chips(): number {
+    return 5;
+  }
+
   requiredCardCount(): number {
     // For testing purposes, accept any number of cards
     return this._cards.length;
@@ -122,6 +126,14 @@ describe("Figure", () => {
       expect(typeof figure.multiplier()).toBe("number");
     });
 
+    it("should require subclasses to implement chips()", () => {
+      const cards = [new Card("Heart", "Ace")];
+      const figure = new TestFigure(cards);
+
+      expect(figure.chips()).toBe(5);
+      expect(typeof figure.chips()).toBe("number");
+    });
+
     it("should provide score() method that can be inherited or overridden", () => {
       const cards = [new Card("Heart", "Ace")];
       const figure = new TestFigure(cards);
@@ -131,7 +143,7 @@ describe("Figure", () => {
       expect(typeof figure.score()).toBe("number");
     });
 
-    it("should calculate score by summing card points and multiplying by multiplier", () => {
+    it("should calculate score by adding chips to each card's points", () => {
       class DefaultScoreFigure extends Figure {
         constructor(cards: Card[]) {
           super(cards);
@@ -143,6 +155,10 @@ describe("Figure", () => {
 
         multiplier(): number {
           return 2;
+        }
+
+        chips(): number {
+          return 10;
         }
 
         requiredCardCount(): number {
@@ -157,8 +173,8 @@ describe("Figure", () => {
       ];
       const figure = new DefaultScoreFigure(cards);
 
-      // Should be (5 + 3) * 2 = 16
-      expect(figure.score()).toBe(16);
+      // Should be (5 + 10) + (3 + 10) = 28
+      expect(figure.score()).toBe(28);
     });
 
     it("should require subclasses to implement requiredCardCount()", () => {

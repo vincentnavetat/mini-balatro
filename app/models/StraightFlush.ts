@@ -14,6 +14,10 @@ export class StraightFlush extends Figure {
     return 8;
   }
 
+  chips(): number {
+    return 100;
+  }
+
   requiredCardCount(): number {
     return 5;
   }

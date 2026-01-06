@@ -14,6 +14,10 @@ export class Flush extends Figure {
     return 4;
   }
 
+  chips(): number {
+    return 35;
+  }
+
   requiredCardCount(): number {
     return 5;
   }

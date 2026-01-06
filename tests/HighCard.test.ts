@@ -63,53 +63,53 @@ describe("HighCard", () => {
   });
 
   describe("score", () => {
-    it("should return 2 * 1 for a 2", () => {
+    it("should return 2 + 5 for a 2", () => {
       const cards = [new Card("Heart", "2")];
       const highCard = new HighCard(cards);
 
-      expect(highCard.score()).toBe(2);
+      expect(highCard.score()).toBe(7); // 2 + 5
     });
 
-    it("should return 3 * 1 for a 3", () => {
+    it("should return 3 + 5 for a 3", () => {
       const cards = [new Card("Heart", "3")];
       const highCard = new HighCard(cards);
 
-      expect(highCard.score()).toBe(3);
+      expect(highCard.score()).toBe(8); // 3 + 5
     });
 
-    it("should return 10 * 1 for a 10", () => {
+    it("should return 10 + 5 for a 10", () => {
       const cards = [new Card("Heart", "10")];
       const highCard = new HighCard(cards);
 
-      expect(highCard.score()).toBe(10);
+      expect(highCard.score()).toBe(15); // 10 + 5
     });
 
-    it("should return 10 * 1 for a Jack", () => {
+    it("should return 10 + 5 for a Jack", () => {
       const cards = [new Card("Heart", "Jack")];
       const highCard = new HighCard(cards);
 
-      expect(highCard.score()).toBe(10);
+      expect(highCard.score()).toBe(15); // 10 + 5
     });
 
-    it("should return 10 * 1 for a Queen", () => {
+    it("should return 10 + 5 for a Queen", () => {
       const cards = [new Card("Heart", "Queen")];
       const highCard = new HighCard(cards);
 
-      expect(highCard.score()).toBe(10);
+      expect(highCard.score()).toBe(15); // 10 + 5
     });
 
-    it("should return 10 * 1 for a King", () => {
+    it("should return 10 + 5 for a King", () => {
       const cards = [new Card("Heart", "King")];
       const highCard = new HighCard(cards);
 
-      expect(highCard.score()).toBe(10);
+      expect(highCard.score()).toBe(15); // 10 + 5
     });
 
-    it("should return 11 * 1 for an Ace", () => {
+    it("should return 11 + 5 for an Ace", () => {
       const cards = [new Card("Heart", "Ace")];
       const highCard = new HighCard(cards);
 
-      expect(highCard.score()).toBe(11);
+      expect(highCard.score()).toBe(16); // 11 + 5
     });
 
 
@@ -118,16 +118,16 @@ describe("HighCard", () => {
       numbers.forEach((number, index) => {
         const cards = [new Card("Heart", number as any)];
         const highCard = new HighCard(cards);
-        expect(highCard.score()).toBe(index + 2); // 2, 3, 4, ..., 10
+        expect(highCard.score()).toBe(index + 2 + 5); // 2+5, 3+5, 4+5, ..., 10+5
       });
     });
 
     it("should calculate score correctly for all face cards", () => {
       const testCases = [
-        { number: "Jack", expected: 10 },
-        { number: "Queen", expected: 10 },
-        { number: "King", expected: 10 },
-        { number: "Ace", expected: 11 },
+        { number: "Jack", expected: 15 }, // 10 + 5
+        { number: "Queen", expected: 15 }, // 10 + 5
+        { number: "King", expected: 15 }, // 10 + 5
+        { number: "Ace", expected: 16 }, // 11 + 5
       ];
 
       testCases.forEach(({ number, expected }) => {
@@ -161,7 +161,7 @@ describe("HighCard", () => {
       const cards = [new Card("Spade", "7")];
       const highCard = new HighCard(cards);
 
-      expect(highCard.score()).toBe(7);
+      expect(highCard.score()).toBe(12); // 7 + 5
       expect(highCard.name()).toBe("High card");
       expect(highCard.multiplier()).toBe(1);
     });
@@ -177,13 +177,13 @@ describe("HighCard", () => {
   });
 
   describe("inherited score method", () => {
-    it("should use inherited score() from Figure that sums card points and multiplies by multiplier", () => {
+    it("should use inherited score() from Figure that adds chips to each card's points", () => {
       const cards = [new Card("Heart", "5")];
       const highCard = new HighCard(cards);
 
-      // Inherited score() = sum of card points * multiplier
-      // = 5 * 1 = 5
-      expect(highCard.score()).toBe(5);
+      // Inherited score() = sum of (card points + chips) for each card
+      // = 5 + 5 = 10
+      expect(highCard.score()).toBe(10);
     });
   });
 });

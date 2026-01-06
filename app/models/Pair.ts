@@ -14,6 +14,10 @@ export class Pair extends Figure {
     return 2;
   }
 
+  chips(): number {
+    return 10;
+  }
+
   requiredCardCount(): number {
     return 2;
   }

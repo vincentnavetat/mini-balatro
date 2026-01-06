@@ -14,6 +14,10 @@ export class FourOfAKind extends Figure {
     return 7;
   }
 
+  chips(): number {
+    return 60;
+  }
+
   requiredCardCount(): number {
     return 4;
   }

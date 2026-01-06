@@ -432,27 +432,27 @@ describe("Round", () => {
 
     it("should win exactly at target score", () => {
       const deck = new Deck();
-      const round = new Round(deck, 11); // Target of 11
+      const round = new Round(deck, 16); // Target of 16 (Ace = 11 + 5 chips)
       const card = new Card("Heart", "Ace");
-      const figure = new HighCard([card]); // Ace = 11 points
+      const figure = new HighCard([card]); // Ace = 11 + 5 = 16 points
 
       round.playFigure(figure);
 
-      expect(round.currentScore).toBe(11);
+      expect(round.currentScore).toBe(16);
       expect(round.isWon()).toBe(true);
     });
 
-    it("should handle pair multiplier correctly in score", () => {
+    it("should handle pair chips correctly in score", () => {
       const deck = new Deck();
       const round = new Round(deck, 100);
       const card1 = new Card("Heart", "Ace");
       const card2 = new Card("Diamond", "Ace");
       const pair = new Pair([card1, card2]);
-      // Pair score = (11 + 11) * 2 = 44
+      // Pair score = (11 + 10) + (11 + 10) = 42
 
       round.playFigure(pair);
 
-      expect(round.currentScore).toBe(44);
+      expect(round.currentScore).toBe(42);
     });
 
     it("should play multiple figures in sequence correctly", () => {

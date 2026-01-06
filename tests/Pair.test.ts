@@ -72,63 +72,63 @@ describe("Pair", () => {
   });
 
   describe("score", () => {
-    it("should return (2 + 2) * 2 for two 2s", () => {
+    it("should return (2 + 10) + (2 + 10) for two 2s", () => {
       const cards = [new Card("Heart", "2"), new Card("Diamond", "2")];
       const pair = new Pair(cards);
 
-      expect(pair.score()).toBe(8); // (2 + 2) * 2
+      expect(pair.score()).toBe(24); // (2 + 10) + (2 + 10)
     });
 
-    it("should return (3 + 3) * 2 for two 3s", () => {
+    it("should return (3 + 10) + (3 + 10) for two 3s", () => {
       const cards = [new Card("Heart", "3"), new Card("Diamond", "3")];
       const pair = new Pair(cards);
 
-      expect(pair.score()).toBe(12); // (3 + 3) * 2
+      expect(pair.score()).toBe(26); // (3 + 10) + (3 + 10)
     });
 
-    it("should return (10 + 10) * 2 for two 10s", () => {
+    it("should return (10 + 10) + (10 + 10) for two 10s", () => {
       const cards = [new Card("Heart", "10"), new Card("Diamond", "10")];
       const pair = new Pair(cards);
 
-      expect(pair.score()).toBe(40); // (10 + 10) * 2
+      expect(pair.score()).toBe(40); // (10 + 10) + (10 + 10)
     });
 
-    it("should return (10 + 10) * 2 for two Jacks", () => {
+    it("should return (10 + 10) + (10 + 10) for two Jacks", () => {
       const cards = [new Card("Heart", "Jack"), new Card("Diamond", "Jack")];
       const pair = new Pair(cards);
 
-      expect(pair.score()).toBe(40); // (10 + 10) * 2
+      expect(pair.score()).toBe(40); // (10 + 10) + (10 + 10)
     });
 
-    it("should return (10 + 10) * 2 for two Queens", () => {
+    it("should return (10 + 10) + (10 + 10) for two Queens", () => {
       const cards = [new Card("Heart", "Queen"), new Card("Diamond", "Queen")];
       const pair = new Pair(cards);
 
-      expect(pair.score()).toBe(40); // (10 + 10) * 2
+      expect(pair.score()).toBe(40); // (10 + 10) + (10 + 10)
     });
 
-    it("should return (10 + 10) * 2 for two Kings", () => {
+    it("should return (10 + 10) + (10 + 10) for two Kings", () => {
       const cards = [new Card("Heart", "King"), new Card("Diamond", "King")];
       const pair = new Pair(cards);
 
-      expect(pair.score()).toBe(40); // (10 + 10) * 2
+      expect(pair.score()).toBe(40); // (10 + 10) + (10 + 10)
     });
 
-    it("should return (11 + 11) * 2 for two Aces", () => {
+    it("should return (11 + 10) + (11 + 10) for two Aces", () => {
       const cards = [new Card("Heart", "Ace"), new Card("Diamond", "Ace")];
       const pair = new Pair(cards);
 
-      expect(pair.score()).toBe(44); // (11 + 11) * 2
+      expect(pair.score()).toBe(42); // (11 + 10) + (11 + 10)
     });
 
-    it("should sum both cards and multiply by 2", () => {
+    it("should sum both cards with chips added to each", () => {
       const cards = [
         new Card("Heart", "2"),
         new Card("Diamond", "3"),
       ];
       const pair = new Pair(cards);
 
-      expect(pair.score()).toBe(10); // (2 + 3) * 2
+      expect(pair.score()).toBe(25); // (2 + 10) + (3 + 10)
     });
 
 
@@ -140,17 +140,17 @@ describe("Pair", () => {
           new Card("Diamond", number as any),
         ];
         const pair = new Pair(cards);
-        const expected = (index + 2) * 2 * 2; // (card1 + card2) * multiplier
+        const expected = (index + 2 + 10) * 2; // (card + chips) * 2
         expect(pair.score()).toBe(expected);
       });
     });
 
     it("should calculate score correctly for all face cards", () => {
       const testCases = [
-        { number: "Jack", expected: 40 }, // (10 + 10) * 2
-        { number: "Queen", expected: 40 }, // (10 + 10) * 2
-        { number: "King", expected: 40 }, // (10 + 10) * 2
-        { number: "Ace", expected: 44 }, // (11 + 11) * 2
+        { number: "Jack", expected: 40 }, // (10 + 10) + (10 + 10)
+        { number: "Queen", expected: 40 }, // (10 + 10) + (10 + 10)
+        { number: "King", expected: 40 }, // (10 + 10) + (10 + 10)
+        { number: "Ace", expected: 42 }, // (11 + 10) + (11 + 10)
       ];
 
       testCases.forEach(({ number, expected }) => {
@@ -170,7 +170,7 @@ describe("Pair", () => {
       ];
       const pair = new Pair(cards);
 
-      expect(pair.score()).toBe(42); // (11 + 10) * 2
+      expect(pair.score()).toBe(41); // (11 + 10) + (10 + 10)
     });
   });
 
@@ -188,6 +188,7 @@ describe("Pair", () => {
 
       expect(typeof pair.name()).toBe("string");
       expect(typeof pair.multiplier()).toBe("number");
+      expect(typeof pair.chips()).toBe("number");
       expect(typeof pair.requiredCardCount()).toBe("number");
     });
   });
@@ -200,7 +201,7 @@ describe("Pair", () => {
       ];
       const pair = new Pair(cards);
 
-      expect(pair.score()).toBe(44); // (11 + 11) * 2
+      expect(pair.score()).toBe(42); // (11 + 10) + (11 + 10)
     });
   });
 
@@ -214,16 +215,16 @@ describe("Pair", () => {
   });
 
   describe("inherited score method", () => {
-    it("should use inherited score() from Figure that sums card points and multiplies by multiplier", () => {
+    it("should use inherited score() from Figure that adds chips to each card's points", () => {
       const cards = [
         new Card("Heart", "5"),
         new Card("Diamond", "3"),
       ];
       const pair = new Pair(cards);
 
-      // Inherited score() = sum of card points * multiplier
-      // = (5 + 3) * 2 = 16
-      expect(pair.score()).toBe(16);
+      // Inherited score() = sum of (card points + chips) for each card
+      // = (5 + 10) + (3 + 10) = 28
+      expect(pair.score()).toBe(28);
     });
   });
 });

@@ -14,6 +14,10 @@ export class ThreeOfAKind extends Figure {
     return 3;
   }
 
+  chips(): number {
+    return 30;
+  }
+
   requiredCardCount(): number {
     return 3;
   }

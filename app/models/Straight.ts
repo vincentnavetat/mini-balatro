@@ -14,6 +14,10 @@ export class Straight extends Figure {
     return 4;
   }
 
+  chips(): number {
+    return 30;
+  }
+
   requiredCardCount(): number {
     return 5;
   }

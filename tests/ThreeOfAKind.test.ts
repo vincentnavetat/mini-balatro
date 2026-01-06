@@ -54,7 +54,7 @@ describe("ThreeOfAKind", () => {
   });
 
   describe("score", () => {
-    it("should return (11 + 11 + 11) * 3 for three Aces", () => {
+    it("should return (11 + 30) + (11 + 30) + (11 + 30) for three Aces", () => {
       const cards = [
         new Card("Heart", "Ace"),
         new Card("Diamond", "Ace"),
@@ -62,10 +62,10 @@ describe("ThreeOfAKind", () => {
       ];
       const threeOfAKind = new ThreeOfAKind(cards);
 
-      expect(threeOfAKind.score()).toBe(99); // (11 + 11 + 11) * 3
+      expect(threeOfAKind.score()).toBe(123); // (11 + 30) + (11 + 30) + (11 + 30)
     });
 
-    it("should return (5 + 5 + 5) * 3 for three 5s", () => {
+    it("should return (5 + 30) + (5 + 30) + (5 + 30) for three 5s", () => {
       const cards = [
         new Card("Heart", "5"),
         new Card("Diamond", "5"),
@@ -73,7 +73,7 @@ describe("ThreeOfAKind", () => {
       ];
       const threeOfAKind = new ThreeOfAKind(cards);
 
-      expect(threeOfAKind.score()).toBe(45); // (5 + 5 + 5) * 3
+      expect(threeOfAKind.score()).toBe(105); // (5 + 30) + (5 + 30) + (5 + 30)
     });
   });
 

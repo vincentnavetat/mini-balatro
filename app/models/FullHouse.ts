@@ -14,6 +14,10 @@ export class FullHouse extends Figure {
     return 4;
   }
 
+  chips(): number {
+    return 40;
+  }
+
   requiredCardCount(): number {
     return 5;
   }

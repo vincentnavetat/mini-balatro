@@ -14,6 +14,10 @@ export class DoublePair extends Figure {
     return 2;
   }
 
+  chips(): number {
+    return 20;
+  }
+
   requiredCardCount(): number {
     return 4;
   }

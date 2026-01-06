@@ -14,6 +14,10 @@ export class HighCard extends Figure {
     return 1;
   }
 
+  chips(): number {
+    return 5;
+  }
+
   requiredCardCount(): number {
     return 1;
   }

@@ -14,14 +14,16 @@ export abstract class Figure {
 
   abstract name(): string;
   abstract multiplier(): number;
+  abstract chips(): number;
   abstract requiredCardCount(): number;
 
   score(): number {
     let score = 0;
+    const chipsValue = this.chips();
     this._cards.forEach((card) => {
-      score += card.points;
+      score += card.points + chipsValue;
     });
-    return score * this.multiplier();
+    return score;
   }
 
   protected validateCardCount(): void {
