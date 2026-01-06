@@ -1,35 +1,25 @@
-import { useEffect, useMemo, useState } from "react";
-import type { Route } from "./+types/home";
-import { Deck } from "../models/Deck";
-import { Round, MAX_DISCARDS, MAX_FIGURES } from "../models/Round";
+import { useState, useMemo, useEffect } from "react";
+import { useOutletContext, useNavigate } from "react-router";
+import type { GameContext } from "./game-layout";
 import { FigureFactory } from "../models/FigureFactory";
-import { Player } from "../models/Player";
+import { MAX_DISCARDS, MAX_FIGURES } from "../models/Round";
 
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "Mini Balatro" },
-    { name: "description", content: "A mini Balatro card game" },
-  ];
-}
-
-export default function Home() {
-  const [mounted, setMounted] = useState(false);
-  const [round, setRound] = useState<Round | null>(null);
-  const [player, setPlayer] = useState<Player | null>(null);
-
-  useEffect(() => {
-    // Only create the deck on the client to avoid hydration mismatch
-    setMounted(true);
-    const deck = new Deck();
-    setRound(new Round(deck, 300));
-    setPlayer(new Player());
-  }, []);
-
+export default function Play() {
+  const { 
+    round, 
+    player, 
+    roundNumber, 
+    handUpdateTrigger, 
+    setHandUpdateTrigger,
+    goToShop,
+    resetGame 
+  } = useOutletContext<GameContext>();
+  
+  const navigate = useNavigate();
   const [selectedCards, setSelectedCards] = useState<Set<number>>(new Set());
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [figureName, setFigureName] = useState<string | null>(null);
-  const [handUpdateTrigger, setHandUpdateTrigger] = useState(0); // Trigger re-render when hand changes
 
   const cards = useMemo(() => round ? [...round.hand.cards] : [], [round, handUpdateTrigger]);
   const deckRemaining = useMemo(() => round ? round.deck.cards.length : 0, [round, handUpdateTrigger]);
@@ -41,6 +31,12 @@ export default function Home() {
   const canPlayFigure = useMemo(() => round ? round.canPlayFigure() : false, [round, handUpdateTrigger]);
   const isWon = useMemo(() => round ? round.isWon() : false, [round, handUpdateTrigger]);
   const isLost = useMemo(() => round ? round.isLost() : false, [round, handUpdateTrigger]);
+
+  useEffect(() => {
+    if (isLost) {
+      navigate("/game-over");
+    }
+  }, [isLost, navigate]);
 
   const currentFigureName = useMemo(() => {
     if (selectedCards.size === 0 || submitted) return null;
@@ -58,14 +54,13 @@ export default function Home() {
   }, [selectedCards, cards, submitted]);
 
   const handleCardClick = (index: number) => {
-    if (submitted) return; // Don't allow selection after submit
+    if (submitted || isWon || isLost) return;
 
     setSelectedCards((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(index)) {
         newSet.delete(index);
       } else {
-        // Only allow adding if we haven't reached the limit of 5 cards
         if (newSet.size < 5) {
           newSet.add(index);
         }
@@ -77,20 +72,13 @@ export default function Home() {
   const handleDiscard = () => {
     if (!round) return;
     if (selectedCards.size === 0 || selectedCards.size > 5) return;
-    if (selectedCards.size > deckRemaining) {
-      // Not enough cards in deck to replace
-      return;
-    }
-    if (!round.canDiscard()) {
-      // Already discarded twice
-      return;
-    }
+    if (selectedCards.size > deckRemaining) return;
+    if (!round.canDiscard()) return;
 
     const indicesToDiscard = Array.from(selectedCards);
     round.hand.discardAndReplace(indicesToDiscard, round.deck);
     round.incrementDiscardCount();
 
-    // Clear selection and trigger re-render
     setSelectedCards(new Set());
     setHandUpdateTrigger(prev => prev + 1);
   };
@@ -108,18 +96,13 @@ export default function Home() {
       const figure = FigureFactory.figureForCards(selectedCardArray);
       round.playFigure(figure);
 
-      // Show the figure that was played
       setScore(figure.score());
       setFigureName(figure.name());
       setSubmitted(true);
 
-      // Update hand trigger to reflect new cards
       setHandUpdateTrigger(prev => prev + 1);
 
-      // If user can play another figure, reset after a brief moment
-      // Otherwise, keep submitted state to show final result
       if (round.canPlayFigure()) {
-        // Reset after showing the result briefly
         setTimeout(() => {
           setSubmitted(false);
           setSelectedCards(new Set());
@@ -132,16 +115,11 @@ export default function Home() {
 
   const getColourSymbol = (colour: string) => {
     switch (colour) {
-      case "Heart":
-        return "♥";
-      case "Diamond":
-        return "♦";
-      case "Club":
-        return "♣";
-      case "Spade":
-        return "♠";
-      default:
-        return "";
+      case "Heart": return "♥";
+      case "Diamond": return "♦";
+      case "Club": return "♣";
+      case "Spade": return "♠";
+      default: return "";
     }
   };
 
@@ -158,18 +136,6 @@ export default function Home() {
     }
   };
 
-  if (!mounted || !round) {
-    return (
-      <main className="min-h-screen p-8 bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-gray-100">
-            Mini Balatro
-          </h1>
-        </div>
-      </main>
-    );
-  }
-
   return (
     <main className="min-h-screen p-8 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-6xl mx-auto">
@@ -185,42 +151,32 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Score Indicator */}
         <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border-2 border-blue-200 dark:border-blue-800">
           <div className="flex justify-between items-center">
             <div>
-              <div className="text-sm text-blue-700 dark:text-blue-300 font-medium">
-                Current Score
-              </div>
-              <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">
-                {currentScore}
-              </div>
+              <div className="text-sm text-blue-700 dark:text-blue-300 font-medium">Current Score</div>
+              <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">{currentScore}</div>
             </div>
             <div className="text-center">
-              <div className="text-sm text-blue-700 dark:text-blue-300 font-medium">
-                Target Score
-              </div>
-              <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">
-                {targetScore}
-              </div>
+              <div className="text-sm text-blue-700 dark:text-blue-300 font-medium">Target Score</div>
+              <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">{targetScore}</div>
             </div>
             <div className="text-right">
-              <div className="text-sm text-blue-700 dark:text-blue-300 font-medium">
-                Figures Played
-              </div>
-              <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">
-                {figuresPlayed} / {MAX_FIGURES}
-              </div>
+              <div className="text-sm text-blue-700 dark:text-blue-300 font-medium">Figures Played</div>
+              <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">{figuresPlayed} / {MAX_FIGURES}</div>
             </div>
           </div>
           {isWon && (
-            <div className="mt-3 text-center text-lg font-bold text-green-700 dark:text-green-300">
-              🎉 You Won! 🎉
-            </div>
-          )}
-          {isLost && (
-            <div className="mt-3 text-center text-lg font-bold text-red-700 dark:text-red-300">
-              Game Over - You Lost
+            <div className="mt-6 text-center">
+              <div className="text-lg font-bold text-green-700 dark:text-green-300 mb-4">
+                🎉 You Won Round {roundNumber}! 🎉
+              </div>
+              <button
+                onClick={goToShop}
+                className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold shadow-lg transform transition-all hover:scale-105"
+              >
+                Go to Shop
+              </button>
             </div>
           )}
         </div>
@@ -234,7 +190,7 @@ export default function Home() {
               Deck: {deckRemaining} cards remaining
             </p>
           </div>
-          {!submitted && (
+          {!submitted && !isWon && !isLost && (
             <div className="space-y-1">
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Select up to 5 cards ({selectedCards.size} / 5 selected)
@@ -249,13 +205,13 @@ export default function Home() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4">
           {cards.map((card, index) => {
             const isSelected = selectedCards.has(index);
-            const isDisabled = !submitted && !isSelected && selectedCards.size >= 5;
+            const isDisabled = !submitted && !isWon && !isLost && !isSelected && selectedCards.size >= 5;
             return (
               <div
                 key={index}
                 onClick={() => handleCardClick(index)}
                 className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border-2 transition-all ${
-                  submitted
+                  submitted || isWon || isLost
                     ? "cursor-default"
                     : isDisabled
                     ? "cursor-not-allowed opacity-50"
@@ -285,12 +241,12 @@ export default function Home() {
         </div>
 
         <div className="mt-8 flex flex-col items-center gap-4">
-          {!submitted && currentFigureName && (
+          {!submitted && currentFigureName && !isWon && !isLost && (
             <div className="mb-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/40 rounded-full text-blue-800 dark:text-blue-200 font-bold text-lg shadow-sm border border-blue-200 dark:border-blue-700">
               {currentFigureName}
             </div>
           )}
-          {!submitted && (
+          {!submitted && !isWon && !isLost && (
             <div className="flex gap-4">
               <button
                 onClick={handleDiscard}
@@ -332,3 +288,4 @@ export default function Home() {
     </main>
   );
 }
+
