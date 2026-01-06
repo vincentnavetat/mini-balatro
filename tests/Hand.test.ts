@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Hand } from "../app/models/Hand";
 import { Deck } from "../app/models/Deck";
-import { Card } from "../app/models/Card";
+import { Card, VALID_NUMBERS } from "../app/models/Card";
 
 describe("Hand", () => {
   describe("constructor", () => {
@@ -41,16 +41,28 @@ describe("Hand", () => {
       expect(handCardKeys.size + deckCardKeys.size).toBe(52);
     });
 
-    it("should draw cards from the top of the deck", () => {
+    it("should have cards sorted by number (lowest to highest)", () => {
       const deck = new Deck();
-      const topCard = deck.cards[0];
-      const secondCard = deck.cards[1];
+      const hand = new Hand(deck);
+      
+      const cards = hand.cards;
+      for (let i = 0; i < cards.length - 1; i++) {
+        const currentRank = VALID_NUMBERS.indexOf(cards[i].number as any);
+        const nextRank = VALID_NUMBERS.indexOf(cards[i+1].number as any);
+        expect(currentRank).toBeLessThanOrEqual(nextRank);
+      }
+    });
+
+    it("should draw cards from the top of the deck and contain them", () => {
+      const deck = new Deck();
+      const topCards = deck.cards.slice(0, 7);
       
       const hand = new Hand(deck);
       
-      // The first card in hand should be the top card from deck
-      expect(hand.cards[0]).toBe(topCard);
-      expect(hand.cards[1]).toBe(secondCard);
+      // The hand should contain all top cards drawn from the deck, but they might be reordered
+      for (const card of topCards) {
+        expect(hand.cards).toContain(card);
+      }
     });
 
     it("should contain valid Card instances", () => {
@@ -184,7 +196,7 @@ describe("Hand", () => {
       expect(deck.cards.length).toBe(initialDeckSize - 3);
     });
 
-    it("should maintain positions of non-discarded cards", () => {
+    it("should keep non-discarded cards in hand", () => {
       const deck = new Deck();
       const hand = new Hand(deck);
       const cardAtPosition1 = hand.cards[1];
@@ -195,20 +207,14 @@ describe("Hand", () => {
       // Discard card at position 4
       hand.discardAndReplace([4], deck);
       
-      // Cards at other positions should remain in their positions
-      expect(hand.cards[1]).toBe(cardAtPosition1);
-      expect(hand.cards[3]).toBe(cardAtPosition3);
-      expect(hand.cards[5]).toBe(cardAtPosition5);
-      expect(hand.cards[6]).toBe(cardAtPosition6);
-      
-      // Card at position 4 should be new (different)
-      expect(hand.cards[4]).not.toBe(cardAtPosition1);
-      expect(hand.cards[4]).not.toBe(cardAtPosition3);
-      expect(hand.cards[4]).not.toBe(cardAtPosition5);
-      expect(hand.cards[4]).not.toBe(cardAtPosition6);
+      // Cards at other positions should still be in the hand
+      expect(hand.cards).toContain(cardAtPosition1);
+      expect(hand.cards).toContain(cardAtPosition3);
+      expect(hand.cards).toContain(cardAtPosition5);
+      expect(hand.cards).toContain(cardAtPosition6);
     });
 
-    it("should maintain positions when discarding multiple cards", () => {
+    it("should keep non-discarded cards when discarding multiple cards", () => {
       const deck = new Deck();
       const hand = new Hand(deck);
       const cardAtPosition0 = hand.cards[0];
@@ -218,10 +224,10 @@ describe("Hand", () => {
       // Discard cards at positions 1, 3, 4, 5
       hand.discardAndReplace([1, 3, 4, 5], deck);
       
-      // Cards at non-discarded positions should remain
-      expect(hand.cards[0]).toBe(cardAtPosition0);
-      expect(hand.cards[2]).toBe(cardAtPosition2);
-      expect(hand.cards[6]).toBe(cardAtPosition6);
+      // Cards at non-discarded positions should still be in the hand
+      expect(hand.cards).toContain(cardAtPosition0);
+      expect(hand.cards).toContain(cardAtPosition2);
+      expect(hand.cards).toContain(cardAtPosition6);
       
       // Hand should still have 7 cards
       expect(hand.cards.length).toBe(7);
@@ -278,7 +284,7 @@ describe("Hand", () => {
       expect(hand.cards.length).toBe(7);
     });
 
-    it("should replace cards with new cards from deck at the same position", () => {
+    it("should replace cards with new cards from deck", () => {
       const deck = new Deck();
       const hand = new Hand(deck);
       const topDeckCard = deck.cards[0];
@@ -286,13 +292,13 @@ describe("Hand", () => {
       
       hand.discardAndReplace([0], deck);
       
-      // The card at index 0 should be the top card from deck (replaced at same position)
-      expect(hand.cards[0]).toBe(topDeckCard);
+      // The hand should now contain the top card from the deck
+      expect(hand.cards).toContain(topDeckCard);
       
       hand.discardAndReplace([0], deck);
       
-      // The card at index 0 should now be the second card from original deck
-      expect(hand.cards[0]).toBe(secondDeckCard);
+      // The hand should now contain the second card from original deck
+      expect(hand.cards).toContain(secondDeckCard);
     });
 
     it("should handle discarding the same index multiple times correctly", () => {
