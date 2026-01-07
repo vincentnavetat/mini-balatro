@@ -5,18 +5,18 @@ import { FigureFactory } from "../models/FigureFactory";
 import { MAX_DISCARDS, MAX_FIGURES } from "../models/Round";
 
 export default function Play() {
-  const { 
-    round, 
-    player, 
-    roundNumber, 
-    handUpdateTrigger, 
+  const {
+    round,
+    player,
+    roundNumber,
+    handUpdateTrigger,
     setHandUpdateTrigger,
     goToShop,
     startNextRound,
     resetGame,
-    hasNextRound 
+    hasNextRound
   } = useOutletContext<GameContext>();
-  
+
   const navigate = useNavigate();
   const [selectedCards, setSelectedCards] = useState<Set<number>>(new Set());
   const [submitted, setSubmitted] = useState(false);
@@ -137,11 +137,13 @@ export default function Play() {
   const getColourClass = (colour: string) => {
     switch (colour) {
       case "Heart":
+        return "text-red-700 dark:text-red-100";
       case "Diamond":
-        return "text-red-600 dark:text-red-400";
+        return "text-orange-600 dark:text-orange-100";
       case "Club":
+        return "text-blue-900 dark:text-blue-100";
       case "Spade":
-        return "text-gray-900 dark:text-gray-100";
+        return "text-gray-600 dark:text-gray-100";
       default:
         return "";
     }
