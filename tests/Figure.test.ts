@@ -173,8 +173,8 @@ describe("Figure", () => {
       ];
       const figure = new DefaultScoreFigure(cards);
 
-      // Should be (5 + 10) + (3 + 10) = 28
-      expect(figure.score()).toBe(28);
+      // Should be ((5 + 10) + (3 + 10)) * 2 = 56
+      expect(figure.score()).toBe(56);
     });
 
     it("should require subclasses to implement requiredCardCount()", () => {

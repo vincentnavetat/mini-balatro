@@ -74,7 +74,7 @@ describe("Straight", () => {
       ];
       const straight = new Straight(cards);
 
-      expect(straight.score()).toBe(170); // (2 + 30) + (3 + 30) + (4 + 30) + (5 + 30) + (6 + 30)
+      expect(straight.score()).toBe(680); // ((2 + 30) + (3 + 30) + (4 + 30) + (5 + 30) + (6 + 30)) * 4
     });
 
     it("should calculate score correctly for a high straight", () => {
@@ -87,7 +87,7 @@ describe("Straight", () => {
       ];
       const straight = new Straight(cards);
 
-      expect(straight.score()).toBe(201); // (10 + 30) + (10 + 30) + (10 + 30) + (10 + 30) + (11 + 30)
+      expect(straight.score()).toBe(804); // ((10 + 30) + (10 + 30) + (10 + 30) + (10 + 30) + (11 + 30)) * 4
     });
   });
 

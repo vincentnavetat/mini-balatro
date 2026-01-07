@@ -23,7 +23,7 @@ export abstract class Figure {
     this._cards.forEach((card) => {
       score += card.points + chipsValue;
     });
-    return score;
+    return score * this.multiplier();
   }
 
   protected validateCardCount(): void {
