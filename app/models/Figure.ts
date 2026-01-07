@@ -1,4 +1,5 @@
 import { Card } from "./Card";
+import { Joker } from "./Joker";
 
 export abstract class Figure {
   protected _cards: Card[];
@@ -17,13 +18,18 @@ export abstract class Figure {
   abstract chips(): number;
   abstract requiredCardCount(): number;
 
-  score(): number {
+  score(jokers: readonly Joker[] = []): number {
+    let multiplier = this.multiplier();
+    for (const joker of jokers) {
+      multiplier = joker.affectFigureMultiplier(multiplier);
+    }
+
     let score = 0;
     const chipsValue = this.chips();
     this._cards.forEach((card) => {
       score += card.points + chipsValue;
     });
-    return score * this.multiplier();
+    return score * multiplier;
   }
 
   protected validateCardCount(): void {

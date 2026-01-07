@@ -5,12 +5,12 @@
     "reward": 4
   },
   {
-    "roundNumber": 1,
+    "roundNumber": 2,
     "targetScore": 450,
     "reward": 5
   },
   {
-    "roundNumber": 1,
+    "roundNumber": 3,
     "targetScore": 600,
     "reward": 5
   }

@@ -5,6 +5,9 @@ class TestJoker extends Joker {
   affectFigureMultiplier(multiplier: number): number {
     return multiplier + 2;
   }
+  name(): string {
+    return "Test Joker";
+  }
 }
 
 describe("Joker", () => {

@@ -105,9 +105,10 @@ export default function Play() {
 
     if (selectedCardArray.length > 0) {
       const figure = FigureFactory.figureForCards(selectedCardArray);
-      round.playFigure(figure);
+      const jokers = player?.jokers ?? [];
+      round.playFigure(figure, jokers);
 
-      setScore(figure.score());
+      setScore(figure.score(jokers));
       setFigureName(figure.name());
       setSubmitted(true);
 
@@ -162,6 +163,35 @@ export default function Play() {
               {player?.money ?? 0}
             </span>
           </div>
+        </div>
+
+        <div className="flex gap-4 mb-8 overflow-x-auto pb-2">
+          {[...Array(5)].map((_, i) => {
+            const joker = player?.jokers[i];
+            return (
+              <div
+                key={i}
+                className={`flex-shrink-0 w-24 h-36 rounded-xl border-2 flex flex-col items-center justify-center p-2 text-center transition-all ${
+                  joker
+                    ? "bg-white dark:bg-gray-800 border-purple-400 dark:border-purple-600 shadow-md rotate-2"
+                    : "bg-gray-100 dark:bg-gray-800/50 border-dashed border-gray-300 dark:border-gray-700"
+                }`}
+              >
+                {joker ? (
+                  <>
+                    <div className="text-2xl mb-1">🃏</div>
+                    <div className="text-xs font-bold text-purple-700 dark:text-purple-300 leading-tight">
+                      {joker.name()}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-gray-400 dark:text-gray-600 text-xs font-medium">
+                    Empty Slot
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border-2 border-blue-200 dark:border-blue-800">

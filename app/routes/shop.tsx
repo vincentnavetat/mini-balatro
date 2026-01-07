@@ -1,8 +1,19 @@
 import { useOutletContext } from "react-router";
 import type { GameContext } from "./game-layout";
+import { Jimbo } from "../models/jokers/Jimbo";
 
 export default function Shop() {
-  const { player, roundNumber, startNextRound, nextTargetScore } = useOutletContext<GameContext>();
+  const { player, roundNumber, startNextRound, nextTargetScore, setHandUpdateTrigger } = useOutletContext<GameContext>();
+
+  const buyJimbo = () => {
+    if (!player) return;
+    const jimbo = new Jimbo();
+    if (player.money >= jimbo.price() && player.jokers.length < 5) {
+      player.money -= jimbo.price();
+      player.addJoker(jimbo);
+      setHandUpdateTrigger(prev => prev + 1);
+    }
+  };
 
   return (
     <main className="min-h-screen p-8 bg-gray-50 dark:bg-gray-900">
@@ -20,11 +31,30 @@ export default function Shop() {
         </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 border-2 border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center min-h-[400px]">
-          <div className="text-gray-400 dark:text-gray-500 mb-8">
-            <svg className="w-24 h-24 mx-auto mb-4 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-            </svg>
-            <p className="text-xl font-medium text-center">Shop items coming soon...</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 w-full max-w-2xl">
+            <div className="p-6 bg-white dark:bg-gray-800 rounded-2xl border-2 border-purple-100 dark:border-purple-900 shadow-lg flex flex-col items-center">
+              <div className="text-6xl mb-4">🃏</div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">Jimbo</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-4">
+                +4 Multiplier to every figure played
+              </p>
+              <button
+                onClick={buyJimbo}
+                disabled={!player || player.money < 2 || player.jokers.length >= 5}
+                className={`w-full py-3 rounded-xl font-bold transition-all ${
+                  !player || player.money < 2 || player.jokers.length >= 5
+                    ? "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
+                    : "bg-purple-600 hover:bg-purple-700 text-white shadow-md hover:shadow-lg transform hover:scale-105"
+                }`}
+              >
+                Buy for $2
+              </button>
+            </div>
+            
+            <div className="p-6 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800 flex flex-col items-center justify-center text-gray-400 dark:text-gray-600">
+              <span className="text-4xl mb-2">🎁</span>
+              <span className="font-medium">More coming soon</span>
+            </div>
           </div>
           
           <button
@@ -51,8 +81,8 @@ export default function Shop() {
             <div className="text-2xl font-black text-blue-600 dark:text-blue-400">{nextTargetScore ?? "N/A"}</div>
           </div>
           <div className="p-6 bg-gray-100/50 dark:bg-gray-800/50 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
-            <div className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Difficulty</div>
-            <div className="text-2xl font-black text-orange-500 dark:text-orange-400">Normal</div>
+            <div className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Joker Slots</div>
+            <div className="text-2xl font-black text-purple-600 dark:text-purple-400">{player?.jokers.length ?? 0} / 5</div>
           </div>
         </div>
       </div>
