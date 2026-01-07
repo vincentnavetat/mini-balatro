@@ -17,7 +17,7 @@ export class Hand {
     this._cards.sort((a, b) => {
       const aIndex = VALID_NUMBERS.indexOf(a.number);
       const bIndex = VALID_NUMBERS.indexOf(b.number);
-      return aIndex - bIndex;
+      return bIndex - aIndex;
     });
   }
 
