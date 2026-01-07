@@ -143,7 +143,7 @@ describe("Figure", () => {
       expect(typeof figure.score()).toBe("number");
     });
 
-    it("should calculate score by adding chips to each card's points", () => {
+    it("should calculate score by adding figure chips to the sum of card points", () => {
       class DefaultScoreFigure extends Figure {
         constructor(cards: Card[]) {
           super(cards);
@@ -173,8 +173,8 @@ describe("Figure", () => {
       ];
       const figure = new DefaultScoreFigure(cards);
 
-      // Should be ((5 + 10) + (3 + 10)) * 2 = 56
-      expect(figure.score()).toBe(56);
+      // Should be (5 + 3 + 10) * 2 = 36
+      expect(figure.score()).toBe(36);
     });
 
     it("should require subclasses to implement requiredCardCount()", () => {

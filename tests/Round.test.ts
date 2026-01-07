@@ -462,11 +462,11 @@ describe("Round", () => {
       const card1 = new Card("Heart", "Ace");
       const card2 = new Card("Diamond", "Ace");
       const pair = new Pair([card1, card2]);
-      // Pair score = ((11 + 10) + (11 + 10)) * 2 = 84
+      // Pair score = (11 + 11 + 10) * 2 = 64
 
       round.playFigure(pair);
 
-      expect(round.currentScore).toBe(84);
+      expect(round.currentScore).toBe(64);
     });
 
     it("should play multiple figures in sequence correctly", () => {

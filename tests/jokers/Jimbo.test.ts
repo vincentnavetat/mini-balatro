@@ -24,11 +24,11 @@ describe("Jimbo Joker", () => {
     ];
     const pair = new Pair(cards); // Pair multiplier is 2, chips is 10
     // Each card is 2 points.
-    // Score without jokers: (2+10 + 2+10) * 2 = 24 * 2 = 48
-    // Score with Jimbo: (2+10 + 2+10) * (2+4) = 24 * 6 = 144
+    // Score without jokers: (2 + 2 + 10) * 2 = 14 * 2 = 28
+    // Score with Jimbo: (2 + 2 + 10) * (2 + 4) = 14 * 6 = 84
     
-    expect(pair.score()).toBe(48);
-    expect(pair.score([jimbo])).toBe(144);
+    expect(pair.score()).toBe(28);
+    expect(pair.score([jimbo])).toBe(84);
   });
 });
 

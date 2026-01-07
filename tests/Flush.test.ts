@@ -74,7 +74,8 @@ describe("Flush", () => {
       ];
       const flush = new Flush(cards);
 
-      expect(flush.score()).toBe(832); // ((2 + 35) + (5 + 35) + (7 + 35) + (9 + 35) + (10 + 35)) * 4
+      // (2 + 5 + 7 + 9 + 10 + 35) * 4 = 68 * 4 = 272
+      expect(flush.score()).toBe(272);
     });
   });
 

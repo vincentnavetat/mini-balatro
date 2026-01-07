@@ -177,12 +177,12 @@ describe("HighCard", () => {
   });
 
   describe("inherited score method", () => {
-    it("should use inherited score() from Figure that adds chips to each card's points", () => {
+    it("should use inherited score() from Figure that adds figure chips to the sum of card points", () => {
       const cards = [new Card("Heart", "5")];
       const highCard = new HighCard(cards);
 
-      // Inherited score() = sum of (card points + chips) for each card
-      // = 5 + 5 = 10
+      // Inherited score() = (sum of card points + figure chips) * multiplier
+      // = (5 + 5) * 1 = 10
       expect(highCard.score()).toBe(10);
     });
   });

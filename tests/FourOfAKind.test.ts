@@ -61,7 +61,7 @@ describe("FourOfAKind", () => {
   });
 
   describe("score", () => {
-    it("should return ((11 + 60) + (11 + 60) + (11 + 60) + (11 + 60)) * 7 for four Aces", () => {
+    it("should return (11 + 11 + 11 + 11 + 60) * 7 for four Aces", () => {
       const cards = [
         new Card("Heart", "Ace"),
         new Card("Diamond", "Ace"),
@@ -70,10 +70,10 @@ describe("FourOfAKind", () => {
       ];
       const fourOfAKind = new FourOfAKind(cards);
 
-      expect(fourOfAKind.score()).toBe(1988); // ((11 + 60) + (11 + 60) + (11 + 60) + (11 + 60)) * 7
+      expect(fourOfAKind.score()).toBe(728); // (11 + 11 + 11 + 11 + 60) * 7
     });
 
-    it("should return ((5 + 60) + (5 + 60) + (5 + 60) + (5 + 60)) * 7 for four 5s", () => {
+    it("should return (5 + 5 + 5 + 5 + 60) * 7 for four 5s", () => {
       const cards = [
         new Card("Heart", "5"),
         new Card("Diamond", "5"),
@@ -82,7 +82,7 @@ describe("FourOfAKind", () => {
       ];
       const fourOfAKind = new FourOfAKind(cards);
 
-      expect(fourOfAKind.score()).toBe(1820); // ((5 + 60) + (5 + 60) + (5 + 60) + (5 + 60)) * 7
+      expect(fourOfAKind.score()).toBe(560); // (5 + 5 + 5 + 5 + 60) * 7
     });
   });
 

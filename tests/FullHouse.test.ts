@@ -74,7 +74,8 @@ describe("FullHouse", () => {
       ];
       const fullHouse = new FullHouse(cards);
 
-      expect(fullHouse.score()).toBe(1012); // ((11 + 40) + (11 + 40) + (11 + 40) + (10 + 40) + (10 + 40)) * 4
+      // (11 + 11 + 11 + 10 + 10 + 40) * 4 = 93 * 4 = 372
+      expect(fullHouse.score()).toBe(372);
     });
   });
 

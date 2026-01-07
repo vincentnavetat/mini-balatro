@@ -25,11 +25,10 @@ export abstract class Figure {
     }
 
     let score = 0;
-    const chipsValue = this.chips();
     this._cards.forEach((card) => {
-      score += card.points + chipsValue;
+      score += card.points;
     });
-    return score * multiplier;
+    return (score + this.chips()) * multiplier;
   }
 
   protected validateCardCount(): void {

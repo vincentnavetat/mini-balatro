@@ -74,7 +74,8 @@ describe("StraightFlush", () => {
       ];
       const straightFlush = new StraightFlush(cards);
 
-      expect(straightFlush.score()).toBe(4160); // ((2 + 100) + (3 + 100) + (4 + 100) + (5 + 100) + (6 + 100)) * 8
+      // (2 + 3 + 4 + 5 + 6 + 100) * 8 = 120 * 8 = 960
+      expect(straightFlush.score()).toBe(960);
     });
 
     it("should calculate score correctly for a high straight flush", () => {
@@ -87,7 +88,8 @@ describe("StraightFlush", () => {
       ];
       const straightFlush = new StraightFlush(cards);
 
-      expect(straightFlush.score()).toBe(4408); // ((10 + 100) + (10 + 100) + (10 + 100) + (10 + 100) + (11 + 100)) * 8
+      // (10 + 10 + 10 + 10 + 11 + 100) * 8 = 151 * 8 = 1208
+      expect(straightFlush.score()).toBe(1208);
     });
   });
 
