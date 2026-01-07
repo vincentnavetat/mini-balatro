@@ -12,5 +12,9 @@ export class Player {
   set money(value: number) {
     this._money = value;
   }
+
+  addMoney(amount: number): void {
+    this._money += amount;
+  }
 }
 

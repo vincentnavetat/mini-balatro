@@ -2,7 +2,7 @@ import { useOutletContext } from "react-router";
 import type { GameContext } from "./game-layout";
 
 export default function Shop() {
-  const { player, roundNumber, startNextRound } = useOutletContext<GameContext>();
+  const { player, roundNumber, startNextRound, nextTargetScore } = useOutletContext<GameContext>();
 
   return (
     <main className="min-h-screen p-8 bg-gray-50 dark:bg-gray-900">
@@ -48,7 +48,7 @@ export default function Shop() {
           </div>
           <div className="p-6 bg-gray-100/50 dark:bg-gray-800/50 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
             <div className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Next Target</div>
-            <div className="text-2xl font-black text-blue-600 dark:text-blue-400">{roundNumber === 1 ? 450 : 300 + roundNumber * 150}</div>
+            <div className="text-2xl font-black text-blue-600 dark:text-blue-400">{nextTargetScore ?? "N/A"}</div>
           </div>
           <div className="p-6 bg-gray-100/50 dark:bg-gray-800/50 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
             <div className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Difficulty</div>

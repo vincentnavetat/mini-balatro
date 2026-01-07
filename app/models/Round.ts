@@ -11,15 +11,17 @@ export class Round {
   private _figure: Figure | null;
   private _discardCount: number;
   private _targetScore: number;
+  private _reward: number;
   private _currentScore: number;
   private _figuresPlayed: number;
 
-  constructor(deck: Deck, targetScore: number = 300) {
+  constructor(deck: Deck, targetScore: number = 300, reward: number = 0) {
     this._deck = deck;
     this._hand = new Hand(deck);
     this._figure = null;
     this._discardCount = 0;
     this._targetScore = targetScore;
+    this._reward = reward;
     this._currentScore = 0;
     this._figuresPlayed = 0;
   }
@@ -46,6 +48,10 @@ export class Round {
 
   get targetScore(): number {
     return this._targetScore;
+  }
+
+  get reward(): number {
+    return this._reward;
   }
 
   get currentScore(): number {

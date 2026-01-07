@@ -5,5 +5,6 @@ export default [
     index("routes/play.tsx"),
     route("shop", "routes/shop.tsx"),
     route("game-over", "routes/game-over.tsx"),
+    route("game-won", "routes/game-won.tsx"),
   ])
 ] satisfies RouteConfig;

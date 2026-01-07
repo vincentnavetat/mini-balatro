@@ -24,6 +24,7 @@ describe("Shop Screen", () => {
       player: new Player(50),
       roundNumber: 1,
       startNextRound: vi.fn(),
+      nextTargetScore: 450,
     };
     (useOutletContext as any).mockReturnValue(mockContext);
   });

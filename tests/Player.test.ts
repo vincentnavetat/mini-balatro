@@ -17,5 +17,11 @@ describe("Player", () => {
     const player = new Player(50);
     expect(player.money).toBe(50);
   });
+
+  it("should allow adding money", () => {
+    const player = new Player(50);
+    player.addMoney(25);
+    expect(player.money).toBe(75);
+  });
 });
 

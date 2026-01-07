@@ -12,7 +12,9 @@ export default function Play() {
     handUpdateTrigger, 
     setHandUpdateTrigger,
     goToShop,
-    resetGame 
+    startNextRound,
+    resetGame,
+    hasNextRound 
   } = useOutletContext<GameContext>();
   
   const navigate = useNavigate();
@@ -20,6 +22,7 @@ export default function Play() {
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [figureName, setFigureName] = useState<string | null>(null);
+  const [rewardClaimed, setRewardClaimed] = useState(false);
 
   const cards = useMemo(() => round ? [...round.hand.cards] : [], [round, handUpdateTrigger]);
   const deckRemaining = useMemo(() => round ? round.deck.cards.length : 0, [round, handUpdateTrigger]);
@@ -31,6 +34,14 @@ export default function Play() {
   const canPlayFigure = useMemo(() => round ? round.canPlayFigure() : false, [round, handUpdateTrigger]);
   const isWon = useMemo(() => round ? round.isWon() : false, [round, handUpdateTrigger]);
   const isLost = useMemo(() => round ? round.isLost() : false, [round, handUpdateTrigger]);
+
+  useEffect(() => {
+    if (isWon && !rewardClaimed && player && round) {
+      player.addMoney(round.reward);
+      setRewardClaimed(true);
+      setHandUpdateTrigger(prev => prev + 1);
+    }
+  }, [isWon, rewardClaimed, player, round, setHandUpdateTrigger]);
 
   useEffect(() => {
     if (isLost) {
@@ -168,15 +179,27 @@ export default function Play() {
           </div>
           {isWon && (
             <div className="mt-6 text-center">
-              <div className="text-lg font-bold text-green-700 dark:text-green-300 mb-4">
+              <div className="text-lg font-bold text-green-700 dark:text-green-300 mb-2">
                 🎉 You Won Round {roundNumber}! 🎉
               </div>
-              <button
-                onClick={goToShop}
-                className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold shadow-lg transform transition-all hover:scale-105"
-              >
-                Go to Shop
-              </button>
+              <div className="text-md font-medium text-green-600 dark:text-green-400 mb-4">
+                Reward: +${round?.reward ?? 0}
+              </div>
+              {hasNextRound ? (
+                <button
+                  onClick={goToShop}
+                  className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold shadow-lg transform transition-all hover:scale-105"
+                >
+                  Go to Shop
+                </button>
+              ) : (
+                <button
+                  onClick={startNextRound}
+                  className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-lg transform transition-all hover:scale-105"
+                >
+                  Claim Victory!
+                </button>
+              )}
             </div>
           )}
         </div>

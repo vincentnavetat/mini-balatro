@@ -38,6 +38,8 @@ describe("Play Screen", () => {
       goToShop: vi.fn(),
       startNextRound: vi.fn(),
       resetGame: vi.fn(),
+      hasNextRound: true,
+      nextTargetScore: 450,
     };
     (useOutletContext as any).mockReturnValue(mockContext);
   });
@@ -126,6 +128,28 @@ describe("Play Screen", () => {
       expect(shopButton).toBeInTheDocument();
     });
 
+    it("should display the reward amount when round is won", async () => {
+      renderComponent();
+      
+      vi.spyOn(mockRound, 'isWon').mockReturnValue(true);
+      vi.spyOn(mockRound, 'reward', 'get').mockReturnValue(5);
+      
+      renderComponent();
+      
+      expect(screen.getByText(/Reward: \+\$5/)).toBeInTheDocument();
+    });
+
+    it("should call player.addMoney when round is won", async () => {
+      const addMoneySpy = vi.spyOn(mockPlayer, 'addMoney');
+      vi.spyOn(mockRound, 'isWon').mockReturnValue(true);
+      vi.spyOn(mockRound, 'reward', 'get').mockReturnValue(5);
+      
+      renderComponent();
+      
+      expect(addMoneySpy).toHaveBeenCalledWith(5);
+      expect(mockContext.setHandUpdateTrigger).toHaveBeenCalled();
+    });
+
     it("should call goToShop when the shop button is clicked", async () => {
       const user = userEvent.setup();
       vi.spyOn(mockRound, 'isWon').mockReturnValue(true);
@@ -134,6 +158,19 @@ describe("Play Screen", () => {
       const shopButton = screen.getByRole("button", { name: /go to shop/i });
       await user.click(shopButton);
       expect(mockContext.goToShop).toHaveBeenCalled();
+    });
+
+    it("should show 'Claim Victory!' button when final round is won", async () => {
+      const user = userEvent.setup();
+      mockContext.hasNextRound = false;
+      vi.spyOn(mockRound, 'isWon').mockReturnValue(true);
+      renderComponent();
+      
+      const victoryButton = screen.getByRole("button", { name: /claim victory/i });
+      expect(victoryButton).toBeInTheDocument();
+      
+      await user.click(victoryButton);
+      expect(mockContext.startNextRound).toHaveBeenCalled();
     });
 
     it("should navigate to /game-over when round is lost", async () => {

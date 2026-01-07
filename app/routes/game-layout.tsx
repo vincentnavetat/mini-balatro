@@ -3,6 +3,13 @@ import { Outlet, useNavigate } from "react-router";
 import { Deck } from "../models/Deck";
 import { Round } from "../models/Round";
 import { Player } from "../models/Player";
+import roundsData from "../data/rounds.json";
+
+interface RoundData {
+  roundNumber: number;
+  targetScore: number;
+  reward: number;
+}
 
 export interface GameContext {
   round: Round | null;
@@ -13,6 +20,8 @@ export interface GameContext {
   goToShop: () => void;
   startNextRound: () => void;
   resetGame: () => void;
+  hasNextRound: boolean;
+  nextTargetScore: number | null;
 }
 
 export default function GameLayout() {
@@ -24,10 +33,16 @@ export default function GameLayout() {
 
   const navigate = useNavigate();
 
+  const getRoundData = (num: number): RoundData | undefined => {
+    return (roundsData as RoundData[]).find(r => r.roundNumber === num);
+  };
+
   useEffect(() => {
     setMounted(true);
+    const initialRoundData = getRoundData(1);
+    if (!initialRoundData) return;
     const deck = new Deck();
-    setRound(new Round(deck, 300));
+    setRound(new Round(deck, initialRoundData.targetScore, initialRoundData.reward));
     setPlayer(new Player());
   }, []);
 
@@ -37,19 +52,26 @@ export default function GameLayout() {
 
   const startNextRound = () => {
     const nextRoundNumber = roundNumber + 1;
-    setRoundNumber(nextRoundNumber);
-    const targetScore = nextRoundNumber === 2 ? 450 : 300 + (nextRoundNumber - 1) * 150;
+    const roundData = getRoundData(nextRoundNumber);
 
+    if (!roundData) {
+      navigate("/game-won");
+      return;
+    }
+
+    setRoundNumber(nextRoundNumber);
     const deck = new Deck();
-    setRound(new Round(deck, targetScore));
+    setRound(new Round(deck, roundData.targetScore, roundData.reward));
     setHandUpdateTrigger(prev => prev + 1);
     navigate("/");
   };
 
   const resetGame = () => {
     setRoundNumber(1);
+    const initialRoundData = getRoundData(1);
+    if (!initialRoundData) return;
     const deck = new Deck();
-    setRound(new Round(deck, 300));
+    setRound(new Round(deck, initialRoundData.targetScore, initialRoundData.reward));
     setPlayer(new Player());
     setHandUpdateTrigger(prev => prev + 1);
     navigate("/");
@@ -64,6 +86,8 @@ export default function GameLayout() {
     goToShop,
     startNextRound,
     resetGame,
+    hasNextRound: !!getRoundData(roundNumber + 1),
+    nextTargetScore: getRoundData(roundNumber + 1)?.targetScore ?? null,
   };
 
   if (!mounted || !round || !player) {

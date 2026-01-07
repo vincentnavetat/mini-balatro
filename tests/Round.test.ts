@@ -29,6 +29,20 @@ describe("Round", () => {
       expect(round.targetScore).toBe(500);
     });
 
+    it("should initialize with custom reward", () => {
+      const deck = new Deck();
+      const round = new Round(deck, 300, 10);
+
+      expect(round.reward).toBe(10);
+    });
+
+    it("should initialize with default reward of 0", () => {
+      const deck = new Deck();
+      const round = new Round(deck, 300);
+
+      expect(round.reward).toBe(0);
+    });
+
     it("should create a hand when round starts", () => {
       const deck = new Deck();
       const round = new Round(deck);

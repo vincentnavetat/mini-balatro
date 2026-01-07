@@ -1,0 +1,18 @@
+[
+  {
+    "roundNumber": 1,
+    "targetScore": 300,
+    "reward": 4
+  },
+  {
+    "roundNumber": 1,
+    "targetScore": 450,
+    "reward": 5
+  },
+  {
+    "roundNumber": 1,
+    "targetScore": 600,
+    "reward": 5
+  }
+]
+
