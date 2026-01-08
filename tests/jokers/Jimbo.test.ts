@@ -4,9 +4,10 @@ import { Card } from "../../app/models/Card";
 import { Pair } from "../../app/models/figures/Pair";
 
 describe("Jimbo Joker", () => {
-  it("should have a name and price", () => {
+  it("should have a name, description and price", () => {
     const jimbo = new Jimbo();
     expect(jimbo.name()).toBe("Jimbo");
+    expect(jimbo.description()).toBe("+4 Multiplier to every figure played");
     expect(jimbo.price()).toBe(2);
   });
 

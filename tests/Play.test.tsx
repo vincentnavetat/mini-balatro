@@ -61,7 +61,7 @@ describe("Play Screen", () => {
 
     it("should have submit button disabled initially", () => {
       renderComponent();
-      const submitButton = screen.getByRole("button", { name: /submit/i });
+      const submitButton = screen.getByRole("button", { name: /play hand/i });
       expect(submitButton).toBeDisabled();
     });
 
@@ -88,9 +88,9 @@ describe("Play Screen", () => {
       const user = userEvent.setup();
       renderComponent();
 
-      const submitButton = screen.getByRole("button", { name: /submit/i });
+      const submitButton = screen.getByRole("button", { name: /play hand/i });
       const card = getClickableCard();
-      
+
       if (card) {
         await user.click(card);
         expect(submitButton).toBeEnabled();
@@ -101,9 +101,9 @@ describe("Play Screen", () => {
       const user = userEvent.setup();
       renderComponent();
 
-      const submitButton = screen.getByRole("button", { name: /submit/i });
+      const submitButton = screen.getByRole("button", { name: /play hand/i });
       const card = getClickableCard();
-      
+
       if (card) {
         await user.click(card);
         expect(submitButton).toBeEnabled();
@@ -116,13 +116,13 @@ describe("Play Screen", () => {
   describe("navigation", () => {
     it("should show 'Go to Shop' button when round is won", async () => {
       renderComponent();
-      
+
       // Manually set round as won
       vi.spyOn(mockRound, 'isWon').mockReturnValue(true);
-      
+
       // Re-render to pick up changes
       renderComponent();
-      
+
       expect(screen.getByText(/You Won Round 1!/)).toBeInTheDocument();
       const shopButton = screen.getByRole("button", { name: /go to shop/i });
       expect(shopButton).toBeInTheDocument();
@@ -130,12 +130,12 @@ describe("Play Screen", () => {
 
     it("should display the reward amount when round is won", async () => {
       renderComponent();
-      
+
       vi.spyOn(mockRound, 'isWon').mockReturnValue(true);
       vi.spyOn(mockRound, 'reward', 'get').mockReturnValue(5);
-      
+
       renderComponent();
-      
+
       expect(screen.getByText(/Reward: \+\$5/)).toBeInTheDocument();
     });
 
@@ -143,9 +143,9 @@ describe("Play Screen", () => {
       const addMoneySpy = vi.spyOn(mockPlayer, 'addMoney');
       vi.spyOn(mockRound, 'isWon').mockReturnValue(true);
       vi.spyOn(mockRound, 'reward', 'get').mockReturnValue(5);
-      
+
       renderComponent();
-      
+
       expect(addMoneySpy).toHaveBeenCalledWith(5);
       expect(mockContext.setHandUpdateTrigger).toHaveBeenCalled();
     });
@@ -154,7 +154,7 @@ describe("Play Screen", () => {
       const user = userEvent.setup();
       vi.spyOn(mockRound, 'isWon').mockReturnValue(true);
       renderComponent();
-      
+
       const shopButton = screen.getByRole("button", { name: /go to shop/i });
       await user.click(shopButton);
       expect(mockContext.goToShop).toHaveBeenCalled();
@@ -165,10 +165,10 @@ describe("Play Screen", () => {
       mockContext.hasNextRound = false;
       vi.spyOn(mockRound, 'isWon').mockReturnValue(true);
       renderComponent();
-      
+
       const victoryButton = screen.getByRole("button", { name: /claim victory/i });
       expect(victoryButton).toBeInTheDocument();
-      
+
       await user.click(victoryButton);
       expect(mockContext.startNextRound).toHaveBeenCalled();
     });
@@ -176,7 +176,7 @@ describe("Play Screen", () => {
     it("should navigate to /game-over when round is lost", async () => {
       vi.spyOn(mockRound, 'isLost').mockReturnValue(true);
       renderComponent();
-      
+
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith("/game-over");
       });

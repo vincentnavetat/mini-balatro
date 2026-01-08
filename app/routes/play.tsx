@@ -323,7 +323,7 @@ export default function Play() {
                     : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transform hover:scale-105"
                 }`}
               >
-                Submit
+                Play Hand
               </button>
             </div>
           )}

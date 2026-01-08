@@ -1,16 +1,57 @@
+import { useEffect } from "react";
 import { useOutletContext } from "react-router";
 import type { GameContext } from "./game-layout";
-import { Jimbo } from "../models/jokers/Jimbo";
+import { JokerFactory } from "../models/JokerFactory";
 
 export default function Shop() {
-  const { player, roundNumber, startNextRound, nextTargetScore, setHandUpdateTrigger } = useOutletContext<GameContext>();
+  const {
+    player,
+    roundNumber,
+    startNextRound,
+    nextTargetScore,
+    setHandUpdateTrigger,
+    boughtJokerNames,
+    setBoughtJokerNames,
+    shopJokers,
+    setShopJokers,
+  } = useOutletContext<GameContext>();
 
-  const buyJimbo = () => {
-    if (!player) return;
-    const jimbo = new Jimbo();
-    if (player.money >= jimbo.price() && player.jokers.length < 5) {
-      player.money -= jimbo.price();
-      player.addJoker(jimbo);
+  useEffect(() => {
+    if (shopJokers.length === 0) {
+      const allJokers = JokerFactory.getAllJokers();
+      const availableJokers = allJokers.filter(j => !boughtJokerNames.includes(j.name()));
+
+      // Pick 2 random jokers from available pool
+      const shuffled = [...availableJokers].sort(() => 0.5 - Math.random());
+      const selected: (string | null)[] = shuffled.slice(0, 2).map(j => j.name());
+
+      // If we have fewer than 2, fill with null (empty slots)
+      while (selected.length < 2) {
+        selected.push(null);
+      }
+      setShopJokers(selected);
+    }
+  }, [shopJokers.length, boughtJokerNames, setShopJokers]);
+
+  const buyJoker = (index: number) => {
+    const jokerName = shopJokers[index];
+    if (!player || !jokerName) return;
+
+    const joker = JokerFactory.createJoker(jokerName);
+    if (!joker) return;
+
+    if (player.money >= joker.price() && player.jokers.length < 5) {
+      player.money -= joker.price();
+      player.addJoker(joker);
+
+      // Update shop state: slot becomes empty
+      const newShopJokers = [...shopJokers];
+      newShopJokers[index] = null;
+      setShopJokers(newShopJokers);
+
+      // Add to bought list so it doesn't appear again
+      setBoughtJokerNames(prev => [...prev, jokerName]);
+
       setHandUpdateTrigger(prev => prev + 1);
     }
   };
@@ -32,31 +73,42 @@ export default function Shop() {
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 border-2 border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center min-h-[400px]">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 w-full max-w-2xl">
-            <div className="p-6 bg-white dark:bg-gray-800 rounded-2xl border-2 border-purple-100 dark:border-purple-900 shadow-lg flex flex-col items-center">
-              <div className="text-6xl mb-4">🃏</div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">Jimbo</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-4">
-                +4 Multiplier to every figure played
-              </p>
-              <button
-                onClick={buyJimbo}
-                disabled={!player || player.money < 2 || player.jokers.length >= 5}
-                className={`w-full py-3 rounded-xl font-bold transition-all ${
-                  !player || player.money < 2 || player.jokers.length >= 5
-                    ? "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
-                    : "bg-purple-600 hover:bg-purple-700 text-white shadow-md hover:shadow-lg transform hover:scale-105"
-                }`}
-              >
-                Buy for $2
-              </button>
-            </div>
-            
-            <div className="p-6 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800 flex flex-col items-center justify-center text-gray-400 dark:text-gray-600">
-              <span className="text-4xl mb-2">🎁</span>
-              <span className="font-medium">More coming soon</span>
-            </div>
+            {shopJokers.map((jokerName, index) => {
+              if (!jokerName) {
+                return (
+                  <div key={`empty-${index}`} className="p-6 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800 flex flex-col items-center justify-center text-gray-400 dark:text-gray-600 min-h-[280px]">
+                    <span className="text-4xl mb-2">🚫</span>
+                    <span className="font-medium">Sold Out</span>
+                  </div>
+                );
+              }
+
+              const joker = JokerFactory.createJoker(jokerName);
+              if (!joker) return null;
+
+              return (
+                <div key={jokerName} className="p-6 bg-white dark:bg-gray-800 rounded-2xl border-2 border-purple-100 dark:border-purple-900 shadow-lg flex flex-col items-center">
+                  <div className="text-6xl mb-4">🃏</div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">{joker.name()}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-4 min-h-[40px]">
+                    {joker.description()}
+                  </p>
+                  <button
+                    onClick={() => buyJoker(index)}
+                    disabled={!player || player.money < joker.price() || player.jokers.length >= 5}
+                    className={`w-full py-3 rounded-xl font-bold transition-all ${
+                      !player || player.money < joker.price() || player.jokers.length >= 5
+                        ? "bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
+                        : "bg-purple-600 hover:bg-purple-700 text-white shadow-md hover:shadow-lg transform hover:scale-105"
+                    }`}
+                  >
+                    Buy for ${joker.price()}
+                  </button>
+                </div>
+              );
+            })}
           </div>
-          
+
           <button
             onClick={startNextRound}
             className="group relative px-12 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-xl shadow-2xl transform transition-all hover:scale-105 active:scale-95 overflow-hidden"

@@ -1,20 +1,20 @@
 import { Joker } from "../Joker";
 
-export class Jimbo extends Joker {
+export class GrosMichel extends Joker {
   affectFigureMultiplier(multiplier: number): number {
-    return multiplier + 4;
+    return multiplier + 15;
   }
 
   name(): string {
-    return "Jimbo";
+    return "Gros Michel";
   }
 
   description(): string {
-    return "+4 Multiplier to every figure played";
+    return "+15 Multiplier to every figure played";
   }
 
   price(): number {
-    return 2;
+    return 4;
   }
 }
 
