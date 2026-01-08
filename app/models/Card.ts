@@ -7,12 +7,18 @@ export type CardNumber = typeof VALID_NUMBERS[number];
 export class Card {
   private _colour: CardColour;
   private _number: CardNumber;
+  private _id: string;
 
   constructor(colour: CardColour, number: CardNumber) {
     this.validateColour(colour);
     this.validateNumber(number);
     this._colour = colour;
     this._number = number;
+    this._id = Math.random().toString(36).substring(2, 9);
+  }
+
+  get id(): string {
+    return this._id;
   }
 
   get colour(): CardColour {

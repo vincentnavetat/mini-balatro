@@ -18,14 +18,27 @@ export default function Play() {
   } = useOutletContext<GameContext>();
 
   const navigate = useNavigate();
-  const [selectedCards, setSelectedCards] = useState<Set<number>>(new Set());
+  const [selectedCards, setSelectedCards] = useState<Set<string>>(new Set());
   const [submitted, setSubmitted] = useState(false);
   const [animationPhase, setAnimationPhase] = useState<"idle" | "playing" | "exiting">("idle");
   const [score, setScore] = useState<number | null>(null);
   const [figureName, setFigureName] = useState<string | null>(null);
   const [rewardClaimed, setRewardClaimed] = useState(false);
+  const [domCards, setDomCards] = useState<import("../models/Card").Card[]>([]);
 
   const cards = useMemo(() => round ? [...round.hand.cards] : [], [round, handUpdateTrigger]);
+
+  useEffect(() => {
+    if (round) {
+      const currentHand = round.hand.cards;
+      setDomCards(prev => {
+        const stillInHand = prev.filter(pc => currentHand.some(cc => cc.id === pc.id));
+        const newCards = currentHand.filter(cc => !prev.some(pc => pc.id === cc.id));
+        return [...stillInHand, ...newCards];
+      });
+    }
+  }, [round, handUpdateTrigger]);
+
   const deckRemaining = useMemo(() => round ? round.deck.cards.length : 0, [round, handUpdateTrigger]);
   const canDiscard = useMemo(() => round ? round.canDiscard() : false, [round, handUpdateTrigger]);
   const discardCount = useMemo(() => round ? round.discardCount : 0, [round, handUpdateTrigger]);
@@ -53,8 +66,8 @@ export default function Play() {
   const currentFigureName = useMemo(() => {
     if (selectedCards.size === 0 || submitted) return null;
     const selectedCardArray = Array.from(selectedCards)
-      .map((index) => cards[index])
-      .filter((card) => card !== undefined);
+      .map((id) => cards.find((card) => card.id === id))
+      .filter((card): card is NonNullable<typeof card> => card !== undefined);
 
     if (selectedCardArray.length === 0) return null;
 
@@ -65,16 +78,16 @@ export default function Play() {
     }
   }, [selectedCards, cards, submitted]);
 
-  const handleCardClick = (index: number) => {
+  const handleCardClick = (id: string) => {
     if (submitted || isWon || isLost) return;
 
     setSelectedCards((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(index)) {
-        newSet.delete(index);
+      if (newSet.has(id)) {
+        newSet.delete(id);
       } else {
         if (newSet.size < 5) {
-          newSet.add(index);
+          newSet.add(id);
         }
       }
       return newSet;
@@ -87,7 +100,10 @@ export default function Play() {
     if (selectedCards.size > deckRemaining) return;
     if (!round.canDiscard()) return;
 
-    const indicesToDiscard = Array.from(selectedCards);
+    const indicesToDiscard = Array.from(selectedCards)
+      .map(id => cards.findIndex(c => c.id === id))
+      .filter(index => index !== -1);
+
     round.hand.discardAndReplace(indicesToDiscard, round.deck);
     round.incrementDiscardCount();
 
@@ -101,8 +117,8 @@ export default function Play() {
     if (!round.canPlayFigure()) return;
 
     const selectedCardArray = Array.from(selectedCards)
-      .map((index) => cards[index])
-      .filter((card) => card !== undefined);
+      .map((id) => cards.find(c => c.id === id))
+      .filter((card): card is NonNullable<typeof card> => card !== undefined);
 
     if (selectedCardArray.length > 0) {
       const figure = FigureFactory.figureForCards(selectedCardArray);
@@ -130,6 +146,14 @@ export default function Play() {
         }, 500);
       }, 2000);
     }
+  };
+
+  const handleSortToggle = () => {
+    if (!round) return;
+    const currentMethod = round.hand.sortMethod;
+    const newMethod = currentMethod === "rank" ? "colour" : "rank";
+    round.hand.setSortMethod(newMethod);
+    setHandUpdateTrigger((prev) => prev + 1);
   };
 
   const getColourSymbol = (colour: string) => {
@@ -173,25 +197,37 @@ export default function Play() {
     const rotation = diff * 4; // 4 degrees per card
     const yOffset = Math.pow(Math.abs(diff), 2) * 2; // subtle curve
 
+    // Each card is w-32 (128px). We want them to overlap.
+    // 80px between centers gives a nice overlap.
+    const xBase = diff * 80;
+
     let selectOffset = isSelected ? -40 : 0;
-    let xOffset = 0;
+    let xOffset = xBase;
     let opacity = 1;
     let currentRotation = rotation;
 
-    if (isSelected && animationPhase === "playing") {
+    if (isSelected && (animationPhase === "playing" || animationPhase === "exiting")) {
       selectOffset = -250; // Move above the hand
       currentRotation = 0; // Straighten up
-    } else if (isSelected && animationPhase === "exiting") {
-      selectOffset = -250;
-      currentRotation = 0;
-      xOffset = 1500; // Move to the right
-      opacity = 0;
+
+      // Keep played cards side by side
+      const selectedIds = Array.from(selectedCards);
+      const selectedIndex = selectedIds.indexOf(cards[index].id);
+      const selectedCenterIndex = (selectedIds.length - 1) / 2;
+      const selectedDiff = selectedIndex - selectedCenterIndex;
+      xOffset = selectedDiff * 80;
+
+      if (animationPhase === "exiting") {
+        xOffset += 1500; // Move to the right
+        opacity = 0;
+      }
     }
 
     return {
-      transform: `translateX(${xOffset}px) translateY(${yOffset + selectOffset}px) rotate(${currentRotation}deg)`,
+      transform: `translateX(calc(-50% + ${xOffset}px)) translateY(${yOffset + selectOffset}px) rotate(${currentRotation}deg)`,
       zIndex: 10 + index,
       opacity,
+      willChange: "transform",
     };
   };
 
@@ -283,9 +319,20 @@ export default function Play() {
 
         <div className="mb-4">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-              Your Hand ({cards.length} cards)
-            </h2>
+            <div className="flex items-center gap-4">
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                Your Hand ({cards.length} cards)
+              </h2>
+              <button
+                onClick={handleSortToggle}
+                className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md border border-gray-300 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors flex items-center gap-1"
+              >
+                <span>Sort by:</span>
+                <span className="text-blue-600 dark:text-blue-400">
+                  {round?.hand.sortMethod === "rank" ? "Rank" : "Colour"}
+                </span>
+              </button>
+            </div>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Deck: {deckRemaining} cards remaining
             </p>
@@ -302,18 +349,21 @@ export default function Play() {
           )}
         </div>
 
-        <div className="flex justify-center items-end min-h-[250px] py-12 px-4 overflow-visible">
-          {cards.map((card, index) => {
-            const isSelected = selectedCards.has(index);
+        <div className="relative flex justify-center items-end min-h-[250px] py-12 px-4 overflow-visible">
+          {domCards.map((card) => {
+            const sortedIndex = cards.findIndex((c) => c.id === card.id);
+            if (sortedIndex === -1) return null;
+
+            const isSelected = selectedCards.has(card.id);
             const isDisabled = !submitted && !isWon && !isLost && !isSelected && selectedCards.size >= 5;
-            const transform = getCardTransform(index, cards.length, isSelected);
+            const transform = getCardTransform(sortedIndex, cards.length, isSelected);
 
             return (
               <div
-                key={index}
-                onClick={() => handleCardClick(index)}
+                key={card.id}
+                onClick={() => handleCardClick(card.id)}
                 style={transform}
-                className={`flex-shrink-0 w-32 h-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border-2 transition-all duration-500 -ml-12 first:ml-0 ${
+                className={`absolute left-1/2 flex-shrink-0 w-32 h-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border-2 transition-all duration-500 ${
                   submitted || isWon || isLost
                     ? "cursor-default"
                     : isDisabled

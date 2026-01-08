@@ -1,8 +1,11 @@
-import { Card, VALID_NUMBERS } from "./Card";
+import { Card, VALID_NUMBERS, VALID_COLOURS } from "./Card";
 import { Deck } from "./Deck";
+
+export type SortMethod = "rank" | "colour";
 
 export class Hand {
   private _cards: Card[];
+  private _sortMethod: SortMethod = "rank";
 
   constructor(deck: Deck) {
     this._cards = deck.drawCards(7);
@@ -13,11 +16,36 @@ export class Hand {
     return this._cards;
   }
 
+  get sortMethod(): SortMethod {
+    return this._sortMethod;
+  }
+
+  setSortMethod(method: SortMethod): void {
+    this._sortMethod = method;
+    this.sortCards();
+  }
+
   private sortCards(): void {
     this._cards.sort((a, b) => {
-      const aIndex = VALID_NUMBERS.indexOf(a.number);
-      const bIndex = VALID_NUMBERS.indexOf(b.number);
-      return bIndex - aIndex;
+      if (this._sortMethod === "rank") {
+        const aIndex = VALID_NUMBERS.indexOf(a.number);
+        const bIndex = VALID_NUMBERS.indexOf(b.number);
+        if (aIndex !== bIndex) {
+          return bIndex - aIndex;
+        }
+        // If ranks are equal, sort by colour to keep it stable
+        return VALID_COLOURS.indexOf(a.colour) - VALID_COLOURS.indexOf(b.colour);
+      } else {
+        const aColIndex = VALID_COLOURS.indexOf(a.colour);
+        const bColIndex = VALID_COLOURS.indexOf(b.colour);
+        if (aColIndex !== bColIndex) {
+          return aColIndex - bColIndex;
+        }
+        // If colours are equal, sort by rank
+        const aRankIndex = VALID_NUMBERS.indexOf(a.number);
+        const bRankIndex = VALID_NUMBERS.indexOf(b.number);
+        return bRankIndex - aRankIndex;
+      }
     });
   }
 
