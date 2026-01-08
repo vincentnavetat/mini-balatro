@@ -150,6 +150,29 @@ export default function Play() {
     }
   };
 
+  const getShortNumber = (number: string) => {
+    switch (number) {
+      case "Jack": return "J";
+      case "Queen": return "Q";
+      case "King": return "K";
+      case "Ace": return "A";
+      default: return number;
+    }
+  };
+
+  const getCardTransform = (index: number, total: number, isSelected: boolean) => {
+    const centerIndex = (total - 1) / 2;
+    const diff = index - centerIndex;
+    const rotation = diff * 4; // 4 degrees per card
+    const yOffset = Math.pow(Math.abs(diff), 2) * 2; // subtle curve
+    const selectOffset = isSelected ? -40 : 0; // lift up when selected
+
+    return {
+      transform: `rotate(${rotation}deg) translateY(${yOffset + selectOffset}px)`,
+      zIndex: 10 + index,
+    };
+  };
+
   return (
     <main className="min-h-screen p-8 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-6xl mx-auto">
@@ -257,15 +280,18 @@ export default function Play() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4">
+        <div className="flex justify-center items-end min-h-[250px] py-12 px-4 overflow-visible">
           {cards.map((card, index) => {
             const isSelected = selectedCards.has(index);
             const isDisabled = !submitted && !isWon && !isLost && !isSelected && selectedCards.size >= 5;
+            const transform = getCardTransform(index, cards.length, isSelected);
+
             return (
               <div
                 key={index}
                 onClick={() => handleCardClick(index)}
-                className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border-2 transition-all ${
+                style={transform}
+                className={`flex-shrink-0 w-32 h-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border-2 transition-all duration-300 -ml-12 first:ml-0 ${
                   submitted || isWon || isLost
                     ? "cursor-default"
                     : isDisabled
@@ -273,21 +299,31 @@ export default function Play() {
                     : "cursor-pointer"
                 } ${
                   isSelected
-                    ? "border-blue-500 dark:border-blue-400 ring-4 ring-blue-200 dark:ring-blue-800 shadow-lg scale-105"
+                    ? "border-blue-500 dark:border-blue-400 ring-4 ring-blue-200 dark:ring-blue-800 shadow-2xl"
                     : isDisabled
                     ? "border-gray-200 dark:border-gray-700"
-                    : "border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600"
+                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-2xl"
                 }`}
               >
-                <div className={`text-4xl font-bold text-center ${getColourClass(card.colour)}`}>
-                  {getColourSymbol(card.colour)}
-                </div>
-                <div className="text-center mt-2">
-                  <div className={`text-xl font-semibold ${getColourClass(card.colour)}`}>
-                    {card.number}
+                <div className="h-full flex flex-col justify-between p-2 pointer-events-none relative overflow-hidden">
+                  {/* Top-left corner */}
+                  <div className={`flex flex-col items-center leading-none ${getColourClass(card.colour)}`}>
+                    <span className="text-lg font-bold">{getShortNumber(card.number)}</span>
+                    <span className="text-sm">{getColourSymbol(card.colour)}</span>
                   </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    {card.colour}
+
+                  {/* Center large symbol */}
+                  <div className={`text-5xl self-center opacity-20 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${getColourClass(card.colour)}`}>
+                    {getColourSymbol(card.colour)}
+                  </div>
+                  <div className={`text-4xl self-center z-10 ${getColourClass(card.colour)}`}>
+                    {getColourSymbol(card.colour)}
+                  </div>
+
+                  {/* Bottom-right corner (rotated) */}
+                  <div className={`flex flex-col items-center leading-none rotate-180 ${getColourClass(card.colour)}`}>
+                    <span className="text-lg font-bold">{getShortNumber(card.number)}</span>
+                    <span className="text-sm">{getColourSymbol(card.colour)}</span>
                   </div>
                 </div>
               </div>
