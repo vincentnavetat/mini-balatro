@@ -20,6 +20,7 @@ export default function Play() {
   const navigate = useNavigate();
   const [selectedCards, setSelectedCards] = useState<Set<number>>(new Set());
   const [submitted, setSubmitted] = useState(false);
+  const [animationPhase, setAnimationPhase] = useState<"idle" | "playing" | "exiting">("idle");
   const [score, setScore] = useState<number | null>(null);
   const [figureName, setFigureName] = useState<string | null>(null);
   const [rewardClaimed, setRewardClaimed] = useState(false);
@@ -106,22 +107,28 @@ export default function Play() {
     if (selectedCardArray.length > 0) {
       const figure = FigureFactory.figureForCards(selectedCardArray);
       const jokers = player?.jokers ?? [];
-      round.playFigure(figure, jokers);
 
       setScore(figure.score(jokers));
       setFigureName(figure.name());
       setSubmitted(true);
+      setAnimationPhase("playing");
 
-      setHandUpdateTrigger(prev => prev + 1);
+      // Stay in place for 2 seconds
+      setTimeout(() => {
+        setAnimationPhase("exiting");
 
-      if (round.canPlayFigure()) {
+        // After exit animation, update game state
         setTimeout(() => {
+          round.playFigure(figure, jokers);
+          setHandUpdateTrigger((prev) => prev + 1);
+
           setSubmitted(false);
+          setAnimationPhase("idle");
           setSelectedCards(new Set());
           setScore(null);
           setFigureName(null);
-        }, 1500);
-      }
+        }, 500);
+      }, 2000);
     }
   };
 
@@ -165,11 +172,26 @@ export default function Play() {
     const diff = index - centerIndex;
     const rotation = diff * 4; // 4 degrees per card
     const yOffset = Math.pow(Math.abs(diff), 2) * 2; // subtle curve
-    const selectOffset = isSelected ? -40 : 0; // lift up when selected
+
+    let selectOffset = isSelected ? -40 : 0;
+    let xOffset = 0;
+    let opacity = 1;
+    let currentRotation = rotation;
+
+    if (isSelected && animationPhase === "playing") {
+      selectOffset = -250; // Move above the hand
+      currentRotation = 0; // Straighten up
+    } else if (isSelected && animationPhase === "exiting") {
+      selectOffset = -250;
+      currentRotation = 0;
+      xOffset = 1500; // Move to the right
+      opacity = 0;
+    }
 
     return {
-      transform: `rotate(${rotation}deg) translateY(${yOffset + selectOffset}px)`,
+      transform: `translateX(${xOffset}px) translateY(${yOffset + selectOffset}px) rotate(${currentRotation}deg)`,
       zIndex: 10 + index,
+      opacity,
     };
   };
 
@@ -291,7 +313,7 @@ export default function Play() {
                 key={index}
                 onClick={() => handleCardClick(index)}
                 style={transform}
-                className={`flex-shrink-0 w-32 h-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border-2 transition-all duration-300 -ml-12 first:ml-0 ${
+                className={`flex-shrink-0 w-32 h-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border-2 transition-all duration-500 -ml-12 first:ml-0 ${
                   submitted || isWon || isLost
                     ? "cursor-default"
                     : isDisabled
