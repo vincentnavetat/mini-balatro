@@ -2,6 +2,7 @@ import { Deck } from "./Deck";
 import { Hand } from "./Hand";
 import { Figure } from "./Figure";
 import { Joker } from "./Joker";
+import { Card } from "./Card";
 
 export const MAX_DISCARDS = 2;
 export const MAX_FIGURES = 5;
@@ -86,7 +87,7 @@ export class Round {
     this._discardCount++;
   }
 
-  playFigure(figure: Figure, jokers: readonly Joker[] = []): void {
+  playFigure(figure: Figure, playedCards: readonly Card[] = [], jokers: readonly Joker[] = []): void {
     if (!this.canPlayFigure()) {
       throw new Error("Cannot play figure: either max figures reached, already won, or already lost");
     }
@@ -94,9 +95,10 @@ export class Round {
     // Add figure's score to current score
     this._currentScore += figure.score(jokers);
 
-    // Discard only the cards from the figure, keep remaining cards in hand
+    // Discard all played cards, keep remaining cards in hand
     // Then draw new cards to fill hand
-    this._hand.removeCards([...figure.cards]);
+    const cardsToRemove = playedCards.length > 0 ? [...playedCards] : [...figure.cards];
+    this._hand.removeCards(cardsToRemove);
     this._hand.drawToFill(this._deck, 7);
     this._figure = null;
 

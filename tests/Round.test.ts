@@ -301,36 +301,29 @@ describe("Round", () => {
       expect(round.figuresPlayed).toBe(2);
     });
 
-    it("should discard only figure cards and keep remaining cards in hand", () => {
+    it("should discard all played cards, even those not in the figure", () => {
       const deck = new Deck();
       const round = new Round(deck);
       const initialHandCards = [...round.hand.cards];
       const initialDeckSize = round.deck.cards.length;
       
-      // Find a card from the hand to use in the figure
-      const cardToPlay = initialHandCards[0];
-      const figure = new HighCard([cardToPlay]);
+      // Select 3 cards, but only 1 is used for High Card
+      const playedCards = initialHandCards.slice(0, 3);
+      const figure = new HighCard([playedCards[0]]);
 
-      round.playFigure(figure);
+      round.playFigure(figure, playedCards);
 
       // Should still have 7 cards in hand
       expect(round.hand.cards.length).toBe(7);
       
-      // The played card should not be in the hand anymore
-      const newHandCards = round.hand.cards;
-      const playedCardKey = `${cardToPlay.colour}-${cardToPlay.number}`;
-      const newHandKeys = new Set(newHandCards.map(c => `${c.colour}-${c.number}`));
-      expect(newHandKeys.has(playedCardKey)).toBe(false);
-
-      // The remaining 6 cards from the original hand should still be there
-      const remainingCards = initialHandCards.slice(1);
-      const remainingKeys = new Set(remainingCards.map(c => `${c.colour}-${c.number}`));
-      for (const key of remainingKeys) {
-        expect(newHandKeys.has(key)).toBe(true);
+      // All 3 played cards should not be in the hand anymore
+      const newHandKeys = new Set(round.hand.cards.map(c => c.id));
+      for (const card of playedCards) {
+        expect(newHandKeys.has(card.id)).toBe(false);
       }
 
-      // Deck should have 1 fewer card (1 drawn to replace the played card)
-      expect(round.deck.cards.length).toBe(initialDeckSize - 1);
+      // Deck should have 3 fewer cards (3 drawn to replace the played cards)
+      expect(round.deck.cards.length).toBe(initialDeckSize - 3);
     });
 
     it("should reset figure to null after playing", () => {

@@ -72,19 +72,10 @@ export class Hand {
   }
 
   removeCards(cardsToRemove: Card[]): void {
-    const cardsToRemoveSet = new Set(
-      cardsToRemove.map(c => `${c.colour}-${c.number}`)
-    );
+    const idsToRemove = new Set(cardsToRemove.map(c => c.id));
 
-    // Filter out the cards to remove
-    this._cards = this._cards.filter(card => {
-      const cardKey = `${card.colour}-${card.number}`;
-      if (cardsToRemoveSet.has(cardKey)) {
-        cardsToRemoveSet.delete(cardKey);
-        return false;
-      }
-      return true;
-    });
+    // Filter out the cards to remove by ID
+    this._cards = this._cards.filter(card => !idsToRemove.has(card.id));
   }
 
   drawToFill(deck: Deck, targetCount: number): void {

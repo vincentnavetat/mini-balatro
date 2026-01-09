@@ -151,7 +151,7 @@ export default function Play() {
 
         // After exit animation, update game state
         setTimeout(() => {
-          round.playFigure(figure, jokers);
+          round.playFigure(figure, selectedCardArray, jokers);
           setHandUpdateTrigger((prev) => prev + 1);
 
           setSubmitted(false);
