@@ -109,15 +109,22 @@ export default function Play() {
     if (selectedCards.size > deckRemaining) return;
     if (!round.canDiscard()) return;
 
-    const indicesToDiscard = Array.from(selectedCards)
-      .map(id => cards.findIndex(c => c.id === id))
-      .filter(index => index !== -1);
+    setSubmitted(true);
+    setAnimationPhase("exiting");
 
-    round.hand.discardAndReplace(indicesToDiscard, round.deck);
-    round.incrementDiscardCount();
+    setTimeout(() => {
+      const indicesToDiscard = Array.from(selectedCards)
+        .map(id => cards.findIndex(c => c.id === id))
+        .filter(index => index !== -1);
 
-    setSelectedCards(new Set());
-    setHandUpdateTrigger(prev => prev + 1);
+      round.hand.discardAndReplace(indicesToDiscard, round.deck);
+      round.incrementDiscardCount();
+
+      setSubmitted(false);
+      setAnimationPhase("idle");
+      setSelectedCards(new Set());
+      setHandUpdateTrigger(prev => prev + 1);
+    }, 500);
   };
 
   const handleSubmit = () => {
