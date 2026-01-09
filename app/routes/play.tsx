@@ -25,6 +25,7 @@ export default function Play() {
   const [figureName, setFigureName] = useState<string | null>(null);
   const [rewardClaimed, setRewardClaimed] = useState(false);
   const [domCards, setDomCards] = useState<import("../models/Card").Card[]>([]);
+  const [enteringCards, setEnteringCards] = useState<Set<string>>(new Set());
 
   const cards = useMemo(() => round ? [...round.hand.cards] : [], [round, handUpdateTrigger]);
 
@@ -34,6 +35,14 @@ export default function Play() {
       setDomCards(prev => {
         const stillInHand = prev.filter(pc => currentHand.some(cc => cc.id === pc.id));
         const newCards = currentHand.filter(cc => !prev.some(pc => pc.id === cc.id));
+
+        if (newCards.length > 0) {
+          setEnteringCards(new Set(newCards.map(c => c.id)));
+          setTimeout(() => {
+            setEnteringCards(new Set());
+          }, 50);
+        }
+
         return [...stillInHand, ...newCards];
       });
     }
@@ -191,7 +200,7 @@ export default function Play() {
     }
   };
 
-  const getCardTransform = (index: number, total: number, isSelected: boolean) => {
+  const getCardTransform = (index: number, total: number, isSelected: boolean, cardId: string) => {
     const centerIndex = (total - 1) / 2;
     const diff = index - centerIndex;
     const rotation = diff * 4; // 4 degrees per card
@@ -206,13 +215,16 @@ export default function Play() {
     let opacity = 1;
     let currentRotation = rotation;
 
-    if (isSelected && (animationPhase === "playing" || animationPhase === "exiting")) {
+    if (enteringCards.has(cardId)) {
+      xOffset = -1500; // Come from the left
+      opacity = 0;
+    } else if (isSelected && (animationPhase === "playing" || animationPhase === "exiting")) {
       selectOffset = -250; // Move above the hand
       currentRotation = 0; // Straighten up
 
       // Keep played cards side by side
       const selectedIds = Array.from(selectedCards);
-      const selectedIndex = selectedIds.indexOf(cards[index].id);
+      const selectedIndex = selectedIds.indexOf(cardId);
       const selectedCenterIndex = (selectedIds.length - 1) / 2;
       const selectedDiff = selectedIndex - selectedCenterIndex;
       xOffset = selectedDiff * 80;
@@ -356,7 +368,7 @@ export default function Play() {
 
             const isSelected = selectedCards.has(card.id);
             const isDisabled = !submitted && !isWon && !isLost && !isSelected && selectedCards.size >= 5;
-            const transform = getCardTransform(sortedIndex, cards.length, isSelected);
+            const transform = getCardTransform(sortedIndex, cards.length, isSelected, card.id);
 
             return (
               <div
