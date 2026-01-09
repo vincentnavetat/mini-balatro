@@ -398,7 +398,7 @@ export default function Play() {
               >
                 <div className="h-full flex flex-col justify-between p-2 pointer-events-none relative overflow-hidden">
                   {/* Top-left corner */}
-                  <div className={`flex flex-col items-center leading-none ${getColourClass(card.colour)}`}>
+                  <div className={`flex flex-col leading-none ${getColourClass(card.colour)}`}>
                     <span className="text-lg font-bold">{getShortNumber(card.number)}</span>
                     <span className="text-sm">{getColourSymbol(card.colour)}</span>
                   </div>
@@ -412,7 +412,7 @@ export default function Play() {
                   </div>
 
                   {/* Bottom-right corner (rotated) */}
-                  <div className={`flex flex-col items-center leading-none rotate-180 ${getColourClass(card.colour)}`}>
+                  <div className={`flex flex-col leading-none rotate-180 ${getColourClass(card.colour)}`}>
                     <span className="text-lg font-bold">{getShortNumber(card.number)}</span>
                     <span className="text-sm">{getColourSymbol(card.colour)}</span>
                   </div>
