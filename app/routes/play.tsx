@@ -222,6 +222,15 @@ export default function Play() {
     let opacity = 1;
     let currentRotation = rotation;
 
+    // Stable random values based on card ID for more natural movement
+    const hash = cardId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const randomDelay = (hash % 10) * 0.015; // 0 to 0.135s delay
+    const randomDuration = 0.45 + (hash % 15) * 0.01; // 0.45 to 0.59s duration
+
+    // Slight variation in timing function
+    const easeVariation = (hash % 5) * 0.02;
+    const timingFunction = `cubic-bezier(${0.4 + easeVariation}, 0, ${0.2 + easeVariation}, 1)`;
+
     if (enteringCards.has(cardId)) {
       xOffset = -1500; // Come from the left
       opacity = 0;
@@ -247,6 +256,9 @@ export default function Play() {
       zIndex: 10 + index,
       opacity,
       willChange: "transform",
+      transitionDelay: `${randomDelay}s`,
+      transitionDuration: `${randomDuration}s`,
+      transitionTimingFunction: timingFunction,
     };
   };
 
@@ -382,7 +394,7 @@ export default function Play() {
                 key={card.id}
                 onClick={() => handleCardClick(card.id)}
                 style={transform}
-                className={`absolute left-1/2 flex-shrink-0 w-32 h-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border-2 transition-all duration-500 ${
+                className={`absolute left-1/2 flex-shrink-0 w-32 h-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border-2 transition-all ${
                   submitted || isWon || isLost
                     ? "cursor-default"
                     : isDisabled
