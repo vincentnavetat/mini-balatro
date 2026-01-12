@@ -368,7 +368,7 @@ export default function Play() {
               Deck: {deckRemaining} cards remaining
             </p>
           </div>
-          {!submitted && !isWon && !isLost && (
+          {!isWon && !isLost && (
             <div className="space-y-1">
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Select up to 5 cards ({selectedCards.size} / 5 selected)
