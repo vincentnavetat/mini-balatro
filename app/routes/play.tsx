@@ -225,7 +225,7 @@ export default function Play() {
     // Stable random values based on card ID for more natural movement
     const hash = cardId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const randomDelay = (hash % 10) * 0.015; // 0 to 0.135s delay
-    const randomDuration = 0.45 + (hash % 15) * 0.01; // 0.45 to 0.59s duration
+    const randomDuration = 0.15 + (hash % 15) * 0.01; // 0.15 to 0.29s duration
 
     // Slight variation in timing function
     const easeVariation = (hash % 5) * 0.02;
