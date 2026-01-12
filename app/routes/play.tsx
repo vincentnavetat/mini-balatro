@@ -354,15 +354,6 @@ export default function Play() {
               <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
                 Your Hand ({cards.length} cards)
               </h2>
-              <button
-                onClick={handleSortToggle}
-                className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md border border-gray-300 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors flex items-center gap-1"
-              >
-                <span>Sort by:</span>
-                <span className="text-blue-600 dark:text-blue-400">
-                  {round?.hand.sortMethod === "rank" ? "Rank" : "Colour"}
-                </span>
-              </button>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Deck: {deckRemaining} cards remaining
@@ -451,6 +442,17 @@ export default function Play() {
               >
                 Discard {selectedCards.size > 0 ? `(${selectedCards.size})` : ""}
               </button>
+
+              <button
+                onClick={handleSortToggle}
+                className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md border border-gray-300 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors flex items-center gap-1"
+              >
+                <span>Sort by:</span>
+                <span className="text-blue-600 dark:text-blue-400">
+                  {round?.hand.sortMethod === "rank" ? "Rank" : "Colour"}
+                </span>
+              </button>
+
               <button
                 onClick={handleSubmit}
                 disabled={selectedCards.size === 0 || !canPlayFigure}
