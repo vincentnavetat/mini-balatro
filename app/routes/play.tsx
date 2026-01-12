@@ -401,9 +401,7 @@ export default function Play() {
                     ? "cursor-not-allowed opacity-50"
                     : "cursor-pointer"
                 } ${
-                  isSelected
-                    ? "border-blue-500 dark:border-blue-400 ring-4 ring-blue-200 dark:ring-blue-800 shadow-2xl"
-                    : isDisabled
+                  isDisabled
                     ? "border-gray-200 dark:border-gray-700"
                     : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-2xl"
                 }`}
