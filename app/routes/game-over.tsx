@@ -5,31 +5,31 @@ export default function GameOver() {
   const { player, roundNumber, resetGame } = useOutletContext<GameContext>();
 
   return (
-    <main className="min-h-screen p-8 bg-gray-50 dark:bg-gray-900">
+    <main className="min-h-screen p-8 bg-gray-900">
       <div className="max-w-6xl mx-auto flex flex-col items-center justify-center min-h-[80vh]">
-        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-12 border-4 border-red-100 dark:border-red-900/30 text-center max-w-2xl w-full">
+        <div className="bg-white rounded-3xl shadow-2xl p-12 border-4 border-red-100 text-center max-w-2xl w-full">
           <div className="mb-8">
-            <div className="w-24 h-24 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-12 h-12 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-12 h-12 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
-            <h1 className="text-5xl font-black text-gray-900 dark:text-gray-100 mb-2 tracking-tighter">
+            <h1 className="text-5xl font-black text-gray-900 mb-2 tracking-tighter">
               GAME OVER
             </h1>
-            <p className="text-xl text-gray-500 dark:text-gray-400 font-medium">
+            <p className="text-xl text-gray-500 font-medium">
               You didn't reach the target score in time.
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4 mb-10">
-            <div className="p-6 bg-gray-50 dark:bg-gray-900/50 rounded-2xl">
-              <div className="text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Final Round</div>
-              <div className="text-3xl font-black text-gray-700 dark:text-gray-200">{roundNumber}</div>
+            <div className="p-6 bg-gray-50 rounded-2xl">
+              <div className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Final Round</div>
+              <div className="text-3xl font-black text-gray-700">{roundNumber}</div>
             </div>
-            <div className="p-6 bg-gray-50 dark:bg-gray-900/50 rounded-2xl">
-              <div className="text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Total Money</div>
-              <div className="text-3xl font-black text-yellow-600 dark:text-yellow-400">${player?.money ?? 0}</div>
+            <div className="p-6 bg-gray-50 rounded-2xl">
+              <div className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Total Money</div>
+              <div className="text-3xl font-black text-yellow-600">${player?.money ?? 0}</div>
             </div>
           </div>
 

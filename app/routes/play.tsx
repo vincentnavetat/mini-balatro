@@ -185,13 +185,13 @@ export default function Play() {
   const getColourClass = (colour: string) => {
     switch (colour) {
       case "Heart":
-        return "text-red-700 dark:text-red-100";
+        return "text-red-700";
       case "Diamond":
-        return "text-orange-600 dark:text-orange-100";
+        return "text-orange-600";
       case "Club":
-        return "text-blue-900 dark:text-blue-100";
+        return "text-blue-900";
       case "Spade":
-        return "text-gray-600 dark:text-gray-100";
+        return "text-gray-600";
       default:
         return "";
     }
@@ -263,15 +263,15 @@ export default function Play() {
   };
 
   return (
-    <main className="min-h-screen p-8 bg-gray-50 dark:bg-gray-900">
+    <main className="min-h-screen p-8 bg-gray-900">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-3xl font-bold text-gray-100">
             Mini Balatro
           </h1>
-          <div className="px-4 py-2 bg-yellow-100 dark:bg-yellow-900/40 rounded-full border-2 border-yellow-200 dark:border-yellow-800 flex items-center gap-2">
-            <span className="text-yellow-700 dark:text-yellow-400 font-bold text-xl">$</span>
-            <span className="text-yellow-900 dark:text-yellow-100 font-bold text-xl">
+          <div className="px-4 py-2 bg-yellow-900/40 rounded-full border-2 border-yellow-800 flex items-center gap-2">
+            <span className="text-yellow-400 font-bold text-xl">$</span>
+            <span className="text-yellow-100 font-bold text-xl">
               {player?.money ?? 0}
             </span>
           </div>
@@ -285,19 +285,19 @@ export default function Play() {
                 key={i}
                 className={`flex-shrink-0 w-24 h-36 rounded-xl border-2 flex flex-col items-center justify-center p-2 text-center transition-all ${
                   joker
-                    ? "bg-white dark:bg-gray-800 border-purple-400 dark:border-purple-600 shadow-md rotate-2"
-                    : "bg-gray-100 dark:bg-gray-800/50 border-dashed border-gray-300 dark:border-gray-700"
+                    ? "bg-white border-purple-400 shadow-md rotate-2"
+                    : "bg-gray-800/50 border-dashed border-gray-700"
                 }`}
               >
                 {joker ? (
                   <>
                     <div className="text-2xl mb-1">🃏</div>
-                    <div className="text-xs font-bold text-purple-700 dark:text-purple-300 leading-tight">
+                    <div className="text-xs font-bold text-purple-700 leading-tight">
                       {joker.name()}
                     </div>
                   </>
                 ) : (
-                  <div className="text-gray-400 dark:text-gray-600 text-xs font-medium">
+                  <div className="text-gray-600 text-xs font-medium">
                     Empty Slot
                   </div>
                 )}
@@ -306,27 +306,27 @@ export default function Play() {
           })}
         </div>
 
-        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border-2 border-blue-200 dark:border-blue-800">
+        <div className="mb-6 p-4 bg-blue-900/30 rounded-lg border-2 border-blue-800">
           <div className="flex justify-between items-center">
             <div>
-              <div className="text-sm text-blue-700 dark:text-blue-300 font-medium">Current Score</div>
-              <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">{currentScore}</div>
+              <div className="text-sm text-blue-300 font-medium">Current Score</div>
+              <div className="text-3xl font-bold text-blue-100">{currentScore}</div>
             </div>
             <div className="text-center">
-              <div className="text-sm text-blue-700 dark:text-blue-300 font-medium">Target Score</div>
-              <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">{targetScore}</div>
+              <div className="text-sm text-blue-300 font-medium">Target Score</div>
+              <div className="text-3xl font-bold text-blue-100">{targetScore}</div>
             </div>
             <div className="text-right">
-              <div className="text-sm text-blue-700 dark:text-blue-300 font-medium">Figures Played</div>
-              <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">{figuresPlayed} / {MAX_FIGURES}</div>
+              <div className="text-sm text-blue-300 font-medium">Figures Played</div>
+              <div className="text-3xl font-bold text-blue-100">{figuresPlayed} / {MAX_FIGURES}</div>
             </div>
           </div>
           {isWon && (
             <div className="mt-6 text-center">
-              <div className="text-lg font-bold text-green-700 dark:text-green-300 mb-2">
+              <div className="text-lg font-bold text-green-300 mb-2">
                 🎉 You Won Round {roundNumber}! 🎉
               </div>
-              <div className="text-md font-medium text-green-600 dark:text-green-400 mb-4">
+              <div className="text-md font-medium text-green-400 mb-4">
                 Reward: +${round?.reward ?? 0}
               </div>
               {hasNextRound ? (
@@ -351,20 +351,20 @@ export default function Play() {
         <div className="mb-4">
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-4">
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+              <h2 className="text-xl font-semibold text-gray-200">
                 Your Hand ({cards.length} cards)
               </h2>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-gray-400">
               Deck: {deckRemaining} cards remaining
             </p>
           </div>
           {!isWon && !isLost && (
             <div className="space-y-1">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-400">
                 Select up to 5 cards ({selectedCards.size} / 5 selected)
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-400">
                 Discards remaining: {MAX_DISCARDS - discardCount} / {MAX_DISCARDS}
               </p>
             </div>
@@ -385,7 +385,7 @@ export default function Play() {
                 key={card.id}
                 onClick={() => handleCardClick(card.id)}
                 style={transform}
-                className={`absolute left-1/2 flex-shrink-0 w-32 h-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border-2 transition-all ${
+                className={`absolute left-1/2 flex-shrink-0 w-32 h-48 bg-white rounded-xl shadow-xl border-2 transition-all ${
                   submitted || isWon || isLost
                     ? "cursor-default"
                     : isDisabled
@@ -393,8 +393,8 @@ export default function Play() {
                     : "cursor-pointer"
                 } ${
                   isDisabled
-                    ? "border-gray-200 dark:border-gray-700"
-                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-2xl"
+                    ? "border-gray-200"
+                    : "border-gray-200 hover:border-gray-300 hover:shadow-2xl"
                 }`}
               >
                 <div className="h-full flex flex-col justify-between p-2 pointer-events-none relative overflow-hidden">
@@ -425,7 +425,7 @@ export default function Play() {
 
         <div className="mt-8 flex flex-col items-center gap-4">
           {!submitted && currentFigureName && !isWon && !isLost && (
-            <div className="mb-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/40 rounded-full text-blue-800 dark:text-blue-200 font-bold text-lg shadow-sm border border-blue-200 dark:border-blue-700">
+            <div className="mb-2 px-4 py-2 bg-blue-900/40 rounded-full text-blue-200 font-bold text-lg shadow-sm border border-blue-700">
               {currentFigureName}
             </div>
           )}
@@ -436,7 +436,7 @@ export default function Play() {
                 disabled={selectedCards.size === 0 || selectedCards.size > 5 || selectedCards.size > deckRemaining || !canDiscard}
                 className={`px-6 py-3 rounded-lg font-semibold transition-all ${
                   selectedCards.size === 0 || selectedCards.size > 5 || selectedCards.size > deckRemaining || !canDiscard
-                    ? "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                    ? "bg-gray-700 text-gray-400 cursor-not-allowed"
                     : "bg-orange-600 hover:bg-orange-700 text-white shadow-md hover:shadow-lg transform hover:scale-105"
                 }`}
               >
@@ -445,10 +445,10 @@ export default function Play() {
 
               <button
                 onClick={handleSortToggle}
-                className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md border border-gray-300 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors flex items-center gap-1"
+                className="px-3 py-1 text-xs font-bold uppercase tracking-wider bg-gray-800 text-gray-300 rounded-md border border-gray-700 hover:bg-gray-700 transition-colors flex items-center gap-1"
               >
                 <span>Sort by:</span>
-                <span className="text-blue-600 dark:text-blue-400">
+                <span className="text-blue-400">
                   {round?.hand.sortMethod === "rank" ? "Rank" : "Colour"}
                 </span>
               </button>
@@ -458,7 +458,7 @@ export default function Play() {
                 disabled={selectedCards.size === 0 || !canPlayFigure}
                 className={`px-6 py-3 rounded-lg font-semibold transition-all ${
                   selectedCards.size === 0 || !canPlayFigure
-                    ? "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                    ? "bg-gray-700 text-gray-400 cursor-not-allowed"
                     : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transform hover:scale-105"
                 }`}
               >
@@ -468,11 +468,11 @@ export default function Play() {
           )}
 
           {submitted && figureName !== null && score !== null && (
-            <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/30 rounded-lg border-2 border-green-200 dark:border-green-800">
-              <div className="text-lg font-semibold text-green-800 dark:text-green-200">
+            <div className="mt-4 p-4 bg-green-900/30 rounded-lg border-2 border-green-800">
+              <div className="text-lg font-semibold text-green-200">
                 Figure: {figureName}
               </div>
-              <div className="text-2xl font-bold text-green-700 dark:text-green-300 mt-2">
+              <div className="text-2xl font-bold text-green-300 mt-2">
                 Score: +{score} (Total: {currentScore})
               </div>
             </div>
