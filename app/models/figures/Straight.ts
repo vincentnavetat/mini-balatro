@@ -23,3 +23,5 @@ export class Straight extends Figure {
   }
 }
 
+
+

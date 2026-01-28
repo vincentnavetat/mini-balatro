@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
-import { useOutletContext, useNavigate } from "react-router";
+import { useOutletContext } from "react-router";
+import { useNavigateWithTransition } from "../hooks/useNavigateWithTransition";
 import type { GameContext } from "./game-layout";
 import { FigureFactory } from "../models/FigureFactory";
 import { MAX_DISCARDS, MAX_FIGURES } from "../models/Round";
@@ -17,7 +18,7 @@ export default function Play() {
     hasNextRound
   } = useOutletContext<GameContext>();
 
-  const navigate = useNavigate();
+  const navigate = useNavigateWithTransition();
   const [selectedCards, setSelectedCards] = useState<Set<string>>(new Set());
   const [submitted, setSubmitted] = useState(false);
   const [animationPhase, setAnimationPhase] = useState<"idle" | "playing" | "exiting">("idle");

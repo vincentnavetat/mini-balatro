@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router";
+import { Outlet } from "react-router";
+import { useNavigateWithTransition } from "../hooks/useNavigateWithTransition";
 import { Deck } from "../models/Deck";
 import { Round } from "../models/Round";
 import { Player } from "../models/Player";
@@ -37,7 +38,7 @@ export default function GameLayout() {
   const [boughtJokerNames, setBoughtJokerNames] = useState<string[]>([]);
   const [shopJokers, setShopJokers] = useState<(string | null)[]>([]);
 
-  const navigate = useNavigate();
+  const navigate = useNavigateWithTransition();
 
   const getRoundData = (num: number): RoundData | undefined => {
     return (roundsData as RoundData[]).find(r => r.roundNumber === num);
