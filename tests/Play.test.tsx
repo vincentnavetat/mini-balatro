@@ -178,7 +178,7 @@ describe("Play Screen", () => {
       renderComponent();
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith("/game-over");
+        expect(mockNavigate).toHaveBeenCalledWith("/game-over", { viewTransition: true });
       });
     });
   });
