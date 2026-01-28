@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Outlet } from "react-router";
+import { useCallback, useEffect, useState } from "react";
+import { NavigationType, Outlet, useBlocker } from "react-router";
 import { useNavigateWithTransition } from "../hooks/useNavigateWithTransition";
 import { Deck } from "../models/Deck";
 import { Round } from "../models/Round";
@@ -39,6 +39,15 @@ export default function GameLayout() {
   const [shopJokers, setShopJokers] = useState<(string | null)[]>([]);
 
   const navigate = useNavigateWithTransition();
+
+  // Block browser back/forward so the user can't return to shop or previous rounds
+  useBlocker(
+    useCallback(
+      ({ historyAction }: { historyAction: NavigationType }) =>
+        historyAction === NavigationType.Pop,
+      []
+    )
+  );
 
   const getRoundData = (num: number): RoundData | undefined => {
     return (roundsData as RoundData[]).find(r => r.roundNumber === num);
