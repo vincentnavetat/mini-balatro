@@ -98,6 +98,20 @@ export default function Play() {
     }
   }, [selectedCards, cards, submitted]);
 
+  const scoringCardIds = useMemo(() => {
+    if (animationPhase !== "playing" || selectedCards.size === 0) return new Set<string>();
+    const selectedCardArray = Array.from(selectedCards)
+      .map((id) => cards.find((card) => card.id === id))
+      .filter((card): card is NonNullable<typeof card> => card !== undefined);
+    if (selectedCardArray.length === 0) return new Set<string>();
+    try {
+      const figure = FigureFactory.figureForCards(selectedCardArray);
+      return new Set(figure.cards.map((c) => c.id));
+    } catch {
+      return new Set<string>();
+    }
+  }, [animationPhase, selectedCards, cards]);
+
   const handleCardClick = (id: string) => {
     if (submitted || isWon || isLost) return;
 
@@ -222,7 +236,7 @@ export default function Play() {
     const centerIndex = (total - 1) / 2;
     const diff = index - centerIndex;
     const rotation = diff * 4; // 4 degrees per card
-    const yOffset = Math.pow(Math.abs(diff), 2) * 2; // subtle curve
+    const handYOffset = Math.pow(Math.abs(diff), 2) * 2; // subtle curve
 
     // Each card is w-32 (128px). We want them to overlap.
     // 80px between centers gives a nice overlap.
@@ -230,6 +244,7 @@ export default function Play() {
 
     let selectOffset = isSelected ? -40 : 0;
     let xOffset = xBase;
+    let yOffset = handYOffset;
     let opacity = 1;
     let currentRotation = rotation;
 
@@ -248,13 +263,15 @@ export default function Play() {
     } else if (isSelected && (animationPhase === "playing" || animationPhase === "exiting")) {
       selectOffset = -250; // Move above the hand
       currentRotation = 0; // Straighten up
+      yOffset = 0; // Same vertical line for all played cards
 
-      // Keep played cards side by side
+      // Played cards side by side with padding (card width 128px + 16px gap)
+      const cardWidthWithGap = 144;
       const selectedIds = Array.from(selectedCards);
       const selectedIndex = selectedIds.indexOf(cardId);
       const selectedCenterIndex = (selectedIds.length - 1) / 2;
       const selectedDiff = selectedIndex - selectedCenterIndex;
-      xOffset = selectedDiff * 80;
+      xOffset = selectedDiff * cardWidthWithGap;
 
       if (animationPhase === "exiting") {
         xOffset += 1500; // Move to the right
@@ -391,13 +408,21 @@ export default function Play() {
             const isDisabled = !submitted && !isWon && !isLost && !isSelected && selectedCards.size >= 5;
             const transform = getCardTransform(sortedIndex, cards.length, isSelected, card.id);
             const showBack = enteringCards.has(card.id) || cardsToFlip.has(card.id);
+            const isNonScoring =
+              animationPhase === "playing" && isSelected && !scoringCardIds.has(card.id);
+
+            const transitionWithFilter = `transform ${transform.transitionDuration} ${transform.transitionTimingFunction} ${transform.transitionDelay}, opacity ${transform.transitionDuration} ${transform.transitionTimingFunction} ${transform.transitionDelay}, filter 0.35s ease`;
 
             return (
               <div
                 key={card.id}
                 onClick={() => handleCardClick(card.id)}
-                style={transform}
-                className={`absolute left-1/2 flex-shrink-0 w-32 h-48 rounded-xl transition-all ${
+                style={{
+                  ...transform,
+                  transition: transitionWithFilter,
+                  ...(isNonScoring ? { filter: "brightness(0.45)" } : {}),
+                }}
+                className={`absolute left-1/2 flex-shrink-0 w-32 h-48 rounded-xl ${
                   submitted || isWon || isLost
                     ? "cursor-default"
                     : isDisabled
