@@ -27,6 +27,7 @@ export default function Play() {
   const [rewardClaimed, setRewardClaimed] = useState(false);
   const [domCards, setDomCards] = useState<import("../models/Card").Card[]>([]);
   const [enteringCards, setEnteringCards] = useState<Set<string>>(new Set());
+  const [cardsToFlip, setCardsToFlip] = useState<Set<string>>(new Set());
 
   const cards = useMemo(() => round ? [...round.hand.cards] : [], [round, handUpdateTrigger]);
 
@@ -38,10 +39,19 @@ export default function Play() {
         const newCards = currentHand.filter(cc => !prev.some(pc => pc.id === cc.id));
 
         if (newCards.length > 0) {
-          setEnteringCards(new Set(newCards.map(c => c.id)));
+          const newIds = new Set(newCards.map(c => c.id));
+          setEnteringCards(newIds);
           setTimeout(() => {
             setEnteringCards(new Set());
+            setCardsToFlip(prev => new Set([...prev, ...newIds]));
           }, 50);
+          setTimeout(() => {
+            setCardsToFlip(prev => {
+              const next = new Set(prev);
+              newIds.forEach(id => next.delete(id));
+              return next;
+            });
+          }, 350);
         }
 
         return [...stillInHand, ...newCards];
@@ -372,7 +382,7 @@ export default function Play() {
           )}
         </div>
 
-        <div className="relative flex justify-center items-end min-h-[250px] py-12 px-4 overflow-visible">
+        <div className="relative flex justify-center items-end min-h-[250px] py-12 px-4 overflow-visible" style={{ perspective: "1200px" }}>
           {domCards.map((card) => {
             const sortedIndex = cards.findIndex((c) => c.id === card.id);
             if (sortedIndex === -1) return null;
@@ -380,43 +390,72 @@ export default function Play() {
             const isSelected = selectedCards.has(card.id);
             const isDisabled = !submitted && !isWon && !isLost && !isSelected && selectedCards.size >= 5;
             const transform = getCardTransform(sortedIndex, cards.length, isSelected, card.id);
+            const showBack = enteringCards.has(card.id) || cardsToFlip.has(card.id);
 
             return (
               <div
                 key={card.id}
                 onClick={() => handleCardClick(card.id)}
                 style={transform}
-                className={`absolute left-1/2 flex-shrink-0 w-32 h-48 bg-white rounded-xl shadow-xl border-2 transition-all ${
+                className={`absolute left-1/2 flex-shrink-0 w-32 h-48 rounded-xl transition-all ${
                   submitted || isWon || isLost
                     ? "cursor-default"
                     : isDisabled
                     ? "cursor-not-allowed opacity-50"
                     : "cursor-pointer"
-                } ${
-                  isDisabled
-                    ? "border-gray-200"
-                    : "border-gray-200 hover:border-gray-300 hover:shadow-2xl"
                 }`}
               >
-                <div className="h-full flex flex-col justify-between p-2 pointer-events-none relative overflow-hidden">
-                  {/* Top-left corner */}
-                  <div className={`flex flex-col leading-none ${getColourClass(card.colour)}`}>
-                    <span className="text-lg font-bold">{getShortNumber(card.number)}</span>
-                    <span className="text-sm">{getColourSymbol(card.colour)}</span>
-                  </div>
+                <div
+                  className="w-full h-full relative rounded-xl"
+                  style={{
+                    width: "128px",
+                    height: "192px",
+                    transformStyle: "preserve-3d",
+                    transform: showBack ? "rotateY(180deg)" : "rotateY(0deg)",
+                    transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+                >
+                  {/* Card back (rear side) */}
+                  <div
+                    className="absolute inset-0 rounded-xl border-2 border-amber-800 shadow-xl pointer-events-none card-back"
+                    style={{
+                      backfaceVisibility: "hidden",
+                      transform: "rotateY(180deg)",
+                      width: "128px",
+                      height: "192px",
+                    }}
+                  />
 
-                  {/* Center large symbol */}
-                  <div className={`text-5xl self-center opacity-20 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${getColourClass(card.colour)}`}>
-                    {getColourSymbol(card.colour)}
-                  </div>
-                  <div className={`text-4xl self-center z-10 ${getColourClass(card.colour)}`}>
-                    {getColourSymbol(card.colour)}
-                  </div>
+                  {/* Card front */}
+                  <div
+                    className={`absolute inset-0 bg-white rounded-xl shadow-xl border-2 overflow-hidden ${
+                      isDisabled ? "border-gray-200" : "border-gray-200 hover:border-gray-300 hover:shadow-2xl"
+                    }`}
+                    style={{
+                      backfaceVisibility: "hidden",
+                    }}
+                  >
+                    <div className="h-full flex flex-col justify-between p-2 pointer-events-none relative overflow-hidden">
+                      {/* Top-left corner */}
+                      <div className={`flex flex-col leading-none ${getColourClass(card.colour)}`}>
+                        <span className="text-lg font-bold">{getShortNumber(card.number)}</span>
+                        <span className="text-sm">{getColourSymbol(card.colour)}</span>
+                      </div>
 
-                  {/* Bottom-right corner (rotated) */}
-                  <div className={`flex flex-col leading-none rotate-180 ${getColourClass(card.colour)}`}>
-                    <span className="text-lg font-bold">{getShortNumber(card.number)}</span>
-                    <span className="text-sm">{getColourSymbol(card.colour)}</span>
+                      {/* Center large symbol */}
+                      <div className={`text-5xl self-center opacity-20 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${getColourClass(card.colour)}`}>
+                        {getColourSymbol(card.colour)}
+                      </div>
+                      <div className={`text-4xl self-center z-10 ${getColourClass(card.colour)}`}>
+                        {getColourSymbol(card.colour)}
+                      </div>
+
+                      {/* Bottom-right corner (rotated) */}
+                      <div className={`flex flex-col leading-none rotate-180 ${getColourClass(card.colour)}`}>
+                        <span className="text-lg font-bold">{getShortNumber(card.number)}</span>
+                        <span className="text-sm">{getColourSymbol(card.colour)}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
