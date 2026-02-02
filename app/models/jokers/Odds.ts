@@ -1,25 +1,24 @@
 import { Joker } from "../Joker";
 import type { Card } from "../Card";
 
-export class Jimbo extends Joker {
+export class Odds extends Joker {
   affectFigureMultiplier(multiplier: number): number {
-    return multiplier + 4;
+    return multiplier;
   }
 
-  affectCardChip(_card: Card): number {
-    return 0;
+  affectCardChip(card: Card): number {
+    return card.points % 2 === 1 ? 30 : 0;
   }
 
   name(): string {
-    return "Jimbo";
+    return "Odds";
   }
 
   description(): string {
-    return "+4 Multiplier to every figure played";
+    return "+30 chips for every scoring card with an odd number";
   }
 
   price(): number {
     return 2;
   }
 }
-

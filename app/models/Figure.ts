@@ -28,7 +28,12 @@ export abstract class Figure {
     this._cards.forEach((card) => {
       score += card.points;
     });
-    return (score + this.chips()) * multiplier;
+    const extraChips = this._cards.reduce(
+      (sum, card) => sum + jokers.reduce((cardSum, joker) => cardSum + joker.affectCardChip(card), 0),
+      0
+    );
+    const totalChips = this.chips() + extraChips;
+    return (score + totalChips) * multiplier;
   }
 
   protected validateCardCount(): void {
