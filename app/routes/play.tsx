@@ -22,6 +22,7 @@ export default function Play() {
   const [selectedCards, setSelectedCards] = useState<Set<string>>(new Set());
   const [submitted, setSubmitted] = useState(false);
   const [animationPhase, setAnimationPhase] = useState<"idle" | "playing" | "exiting">("idle");
+  const [exitKind, setExitKind] = useState<"play" | "discard" | null>(null);
   const [score, setScore] = useState<number | null>(null);
   const [figureName, setFigureName] = useState<string | null>(null);
   const [rewardClaimed, setRewardClaimed] = useState(false);
@@ -136,6 +137,7 @@ export default function Play() {
 
     setSubmitted(true);
     setAnimationPhase("exiting");
+    setExitKind("discard");
 
     setTimeout(() => {
       const indicesToDiscard = Array.from(selectedCards)
@@ -147,6 +149,7 @@ export default function Play() {
 
       setSubmitted(false);
       setAnimationPhase("idle");
+      setExitKind(null);
       setSelectedCards(new Set());
       setHandUpdateTrigger(prev => prev + 1);
     }, 500);
@@ -173,6 +176,7 @@ export default function Play() {
       // Stay in place for 2 seconds
       setTimeout(() => {
         setAnimationPhase("exiting");
+        setExitKind("play");
 
         // After exit animation, update game state
         setTimeout(() => {
@@ -181,6 +185,7 @@ export default function Play() {
 
           setSubmitted(false);
           setAnimationPhase("idle");
+          setExitKind(null);
           setSelectedCards(new Set());
           setScore(null);
           setFigureName(null);
@@ -259,6 +264,10 @@ export default function Play() {
 
     if (enteringCards.has(cardId)) {
       xOffset = -1500; // Come from the left
+      opacity = 0;
+    } else if (animationPhase === "exiting" && isSelected && exitKind === "discard") {
+      // Discard: slide off horizontally from hand position (no move up)
+      xOffset = xBase + 1500; // Move to the right off screen
       opacity = 0;
     } else if (isSelected && (animationPhase === "playing" || animationPhase === "exiting")) {
       selectOffset = -250; // Move above the hand
